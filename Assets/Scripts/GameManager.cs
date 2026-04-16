@@ -9,6 +9,12 @@ public class GameManager : MonoBehaviour
 {
     # region references
     /// <summary>
+    /// Level en el que se encuentra
+    /// </summary>
+    [SerializeField]
+    private int level;
+
+    /// <summary>
     /// UI manager del juego
     /// </summary>
     [SerializeField]
@@ -128,6 +134,17 @@ public class GameManager : MonoBehaviour
         CheckBoxes(0);
 
         _uiManager.PlayStartTransition();
+        Tracker.Instance.TrackEvent(new ProgresionEvent("Level_Start", (int)Time.time, "level_" + level));
+    }
+
+    public int getLevel()
+    {
+        return level;
+    }
+
+    public int getRoom()
+    {
+        return _currentRoom;
     }
 
     ///<summary>
@@ -234,7 +251,10 @@ public class GameManager : MonoBehaviour
     ///<summary>
     public void ResetRoom()
     {
-        if(_doors != null)
+        Tracker.Instance.TrackEvent(new ProgresionEvent2("Manual_Reset", (int)Time.time, "level_" + level, "room_"+_currentRoom));
+        Tracker.Instance.flush();
+
+        if (_doors != null)
             ResetDoors();
         if(_boxes != null)
             ResetBoxes();
@@ -262,10 +282,13 @@ public class GameManager : MonoBehaviour
     ///<param name="door">La puerta entre la sala actual y la siguiente</param>
     public void passToNextRoom(DoorComponent door)
     {
+        Tracker.Instance.TrackEvent(new ProgresionEvent2("Room_Complete", (int)Time.time, "level_" + level, "room_" + _currentRoom));
+        Tracker.Instance.flush();
         _currentRoom++;
         _playerManager.EnableInputs(false);
         _playerManager.resetSize();
         _playerManager.moveToNextRoom(_currentRoom, _cameraAreas.GetComponentsInChildren<CameraAreaScript>()[_currentRoom].ClosestPoint(_playerManager.getSpawnPoint(_currentRoom)), door);
+        Tracker.Instance.TrackEvent(new ProgresionEvent2("Room_Start", (int)Time.time, "level_" + level, "room_" + _currentRoom));
     }
 
     ///<summary>

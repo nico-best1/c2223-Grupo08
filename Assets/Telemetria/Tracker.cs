@@ -1,20 +1,42 @@
 
+using System.IO;
 
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
 
 public class Tracker
 {
-    static Tracker instance;
+    static Tracker instance = null;
+    const long MINIMUM_SPACE_DISK = 2L * 1024 * 1024 * 1024;
     APersistence persistenceObject;
+    string sessionId;
+    int eventCount;
+    int fileCount = 0;
 
-    public static void Init(bool filePersistence = true, string format = "JSON") {
+    public static void Init(string sessionId, int timeStamp, string path, bool filePersistence = true, string format = "JSON") {
         instance = new Tracker();
-        if(filePersistence)
-            instance.persistenceObject = new FilePersistence();
+        instance.sessionId = sessionId;
+
+        DriveInfo drive = new DriveInfo(Path.GetPathRoot(path));
+
+        long freeSpace = drive.AvailableFreeSpace;
+
+        if (filePersistence && freeSpace > MINIMUM_SPACE_DISK)
+        {
+            FilePersistence per = new FilePersistence();
+            string filePath = path + "/telemetry_" + instance.fileCount + ".json";
+            while (File.Exists(filePath))
+            {
+                instance.fileCount++;
+                filePath = path + "/telemetry_" + instance.fileCount + ".json";
+            }
+            //File.CreateText(filePath);
+            per.setPath(filePath);
+            instance.persistenceObject = per;
+        }
         else
-            instance.persistenceObject = new FilePersistence(); //De momento solo hay persistencia en local
+        {
+            instance.persistenceObject = null;
+            return;
+        }
 
         switch (format)
         {
@@ -25,18 +47,37 @@ public class Tracker
                 instance.persistenceObject.setSerializer(new JSONSerializer());
                 break;
         }
+
+        instance.TrackEvent(new TrackerEvent("Session_Start", timeStamp));
     }
 
-    public static void End(bool flush = true) {
-        if(flush)
-            instance.persistenceObject.Flush();
+    public static void End(int timeStamp, bool flush = true) {
+
+        instance.TrackEvent(new TrackerEvent("Session_End", timeStamp));
+
+        if (flush)
+            instance.flush();
+        instance = null;
     }
 
-    public static Tracker Instance() {
-        return instance;
+    public static Tracker Instance {
+        get { return instance; }
     }
 
-    public static void TrackEvent(TrackerEvent e, Dictionary<string, string> args) {
-        instance.persistenceObject.Send(e);
+    public void TrackEvent(TrackerEvent e) {
+        if (persistenceObject == null)
+            return;
+
+        string eventId = "event_"+eventCount;
+        e.setSessionId(sessionId);
+        e.setEventId(eventId);
+        persistenceObject.Send(e);
+        eventCount++;
+    }
+
+    public void flush()
+    {
+        if(persistenceObject != null)
+            persistenceObject.Flush();
     }
 }

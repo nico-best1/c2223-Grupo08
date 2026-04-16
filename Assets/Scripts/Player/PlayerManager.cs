@@ -78,6 +78,8 @@ public class PlayerManager : MonoBehaviour
         _movementController.SetSlowFactor(_PlayerSize);
         _movementController.SetJumpFactor(_PlayerSize);
         GameManager.Instance.ResizeBallsBar(_PlayerSize);
+
+        Tracker.Instance.TrackEvent(new ProgresionEvent2("Increase_Size", (int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom()));
     }
 
     /// <summary>
@@ -96,7 +98,7 @@ public class PlayerManager : MonoBehaviour
             GameManager.Instance.ResizeBallsBar(_PlayerSize);
         }
 
-
+        Tracker.Instance.TrackEvent(new ProgresionEvent2("Reduce_Size", (int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom()));
     }
 
     /// <summary>

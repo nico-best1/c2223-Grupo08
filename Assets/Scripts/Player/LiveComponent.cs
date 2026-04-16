@@ -46,6 +46,9 @@ public class LiveComponent : MonoBehaviour
         _playerManager.EnableInputs(false);
         _playerAnimator.IsDeath(true);
         Invoke("PlayDeath", 1);
+
+        Tracker.Instance.TrackEvent(new ProgresionEvent2("Player_Death", (int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom()));
+        Tracker.Instance.flush();
     }
 
     /// <summary>

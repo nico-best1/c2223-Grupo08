@@ -1,10 +1,18 @@
+using System.IO;
 
 public class FilePersistence : APersistence
 {
+    string path;
+
+    public void setPath(string p) { path = p; }
+
     public override void Flush() {
-        for(int i = 0; i < MaxBuffer; i++)
+        string data = "";
+        for(int i = MaxBuffer+index-eventSize; i < MaxBuffer+index; i++)
         {
-            events[index+i % MaxBuffer].ToJSON();
+            data += events[i % MaxBuffer].ToJSON();
         }
+
+        File.AppendAllText(path, data);
     }
 }

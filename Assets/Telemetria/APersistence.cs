@@ -2,9 +2,10 @@
 public abstract class APersistence
 {
     protected const int MaxBuffer = 50;
-    protected int index;
+    protected int index = 0;
     protected TrackerEvent[] events = new TrackerEvent[MaxBuffer];
     protected ISerializer serializer;
+    protected int eventSize = 0;
 
     public void setSerializer(ISerializer s)
     {
@@ -13,11 +14,16 @@ public abstract class APersistence
 
     public void Send(TrackerEvent e)
     {
+
+        if(eventSize<MaxBuffer)
+            eventSize++;
+
+        events[index] = e;
+
         if (index < MaxBuffer - 1)
             index++;
         else
             index = 0;
-        events[index] = e;
     }
 
     public abstract void Flush();
