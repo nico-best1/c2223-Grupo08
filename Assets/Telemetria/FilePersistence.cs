@@ -10,7 +10,7 @@ public class FilePersistence : APersistence
         string data = "";
         for(int i = MaxBuffer+index-eventSize; i < MaxBuffer+index; i++)
         {
-            data += events[i % MaxBuffer].ToJSON();
+            data += this.serializer.serialize(events[i % MaxBuffer]);
             data += "\n";
         }
 
