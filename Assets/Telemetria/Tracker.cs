@@ -49,8 +49,8 @@ public class Tracker
                 }
             }
 
-                //File.CreateText(filePath);
-                per.setPath(filePath);
+            //File.CreateText(filePath);
+            per.setPath(filePath);
             instance.persistenceObject = per;
         }
         else
