@@ -11,8 +11,11 @@ public class FilePersistence : APersistence
         for(int i = MaxBuffer+index-eventSize; i < MaxBuffer+index; i++)
         {
             data += events[i % MaxBuffer].ToJSON();
+            data += "\n";
         }
 
         File.AppendAllText(path, data);
+
+        eventSize = 0;
     }
 }
