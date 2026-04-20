@@ -1,7 +1,12 @@
 
 using System;
+using System.Diagnostics;
 using System.IO;
 
+public enum formatType
+{
+    JSON, CSV
+}
 
 public class Tracker
 {
@@ -12,7 +17,7 @@ public class Tracker
     int eventCount;
     int fileCount = 0;
 
-    public static string Init(string sessionId, int timeStamp, string path, bool filePersistence = true, string format = "JSON") {
+    public static string Init(string sessionId, int timeStamp, string path, bool filePersistence = true, formatType format = formatType.JSON) {
         instance = new Tracker();
         instance.sessionId = sessionId;
 
@@ -23,14 +28,29 @@ public class Tracker
         if (filePersistence && freeSpace > MINIMUM_SPACE_DISK)
         {
             FilePersistence per = new FilePersistence();
-            string filePath = path + "/telemetry_" + instance.fileCount + ".json";
-            while (File.Exists(filePath))
+            string filePath = "";
+            if (format == formatType.JSON)
             {
-                instance.fileCount++;
                 filePath = path + "/telemetry_" + instance.fileCount + ".json";
+                while (File.Exists(filePath))
+                {
+                    instance.fileCount++;
+                    filePath = path + "/telemetry_" + instance.fileCount + ".json";
+                }
             }
-            //File.CreateText(filePath);
-            per.setPath(filePath);
+            else if (format == formatType.CSV)
+            {
+                UnityEngine.Debug.Log("CSV");
+                filePath = path + "/telemetry_" + instance.fileCount + ".csv";
+                while (File.Exists(filePath))
+                {
+                    instance.fileCount++;
+                    filePath = path + "/telemetry_" + instance.fileCount + ".csv";
+                }
+            }
+
+                //File.CreateText(filePath);
+                per.setPath(filePath);
             instance.persistenceObject = per;
         }
         else
@@ -44,12 +64,15 @@ public class Tracker
 
         switch (format)
         {
-            case "JSON":
+            case formatType.JSON:
                 instance.persistenceObject.setSerializer(new JSONSerializer());
+                break;
+            case formatType.CSV:
+                instance.persistenceObject.setSerializer(new CSVSerializer());
                 break;
             default:
                 instance.persistenceObject = null;
-                return "Formato no reconozible";
+                return "Formato no reconocible";
         }
 
         instance.TrackEvent(new TrackerEvent("Session_Start", timeStamp));

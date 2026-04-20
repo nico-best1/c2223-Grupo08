@@ -15,12 +15,18 @@ public class TrackerEvent
     public void setSessionId(string id) { sessionId = id; }
     public void setEventId(string id) { eventId = id; }
 
-    public int getTimeStamp(int t) { return timeStamp; }
-    public string setEventType() { return eventType; }
-    public string setSessionId() { return sessionId; }
-    public string setEventId() { return eventId; }
+    public int getTimeStamp() { return timeStamp; }
+    public string getEventType() { return eventType; }
+    public string getSessionId() { return sessionId; }
+    public string getEventId() { return eventId; }
 
     public virtual string ToJSON() { 
         return JsonUtility.ToJson(this);
+    }
+
+    public virtual string ToCSV()
+    {
+        // Variables separadas por comas.
+        return $"{eventType},{sessionId},{eventId},{timeStamp}";
     }
 }

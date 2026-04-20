@@ -6,12 +6,13 @@ public class TrackerManager : MonoBehaviour
     [SerializeField]
     bool filePersistence = true;
     [SerializeField]
-    string format = "JSON";
+    formatType format = formatType.JSON;
 
     void Start()
     {
         if (Tracker.Instance == null)
         {
+            
             string path = Application.persistentDataPath;
             string sessionId = System.Guid.NewGuid().ToString();
             string error = Tracker.Init(sessionId, (int)Time.time, path, filePersistence, format);
