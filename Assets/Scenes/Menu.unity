@@ -3392,6 +3392,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   filePersistence: 1
+  format: JSON
 --- !u!1 &1943858001
 GameObject:
   m_ObjectHideFlags: 0

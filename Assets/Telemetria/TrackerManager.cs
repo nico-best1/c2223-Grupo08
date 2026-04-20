@@ -5,6 +5,8 @@ public class TrackerManager : MonoBehaviour
     Tracker tracker;
     [SerializeField]
     bool filePersistence = true;
+    [SerializeField]
+    string format = "JSON";
 
     void Start()
     {
@@ -12,7 +14,9 @@ public class TrackerManager : MonoBehaviour
         {
             string path = Application.persistentDataPath;
             string sessionId = System.Guid.NewGuid().ToString();
-            Tracker.Init(sessionId, (int)Time.time, path, filePersistence);
+            string error = Tracker.Init(sessionId, (int)Time.time, path, filePersistence, format);
+            if(error != null)
+                Debug.LogWarning(error);
         }
         tracker = Tracker.Instance;
     }

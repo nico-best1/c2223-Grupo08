@@ -1,4 +1,5 @@
 
+using System;
 using System.IO;
 
 
@@ -11,7 +12,7 @@ public class Tracker
     int eventCount;
     int fileCount = 0;
 
-    public static void Init(string sessionId, int timeStamp, string path, bool filePersistence = true, string format = "JSON") {
+    public static string Init(string sessionId, int timeStamp, string path, bool filePersistence = true, string format = "JSON") {
         instance = new Tracker();
         instance.sessionId = sessionId;
 
@@ -35,7 +36,10 @@ public class Tracker
         else
         {
             instance.persistenceObject = null;
-            return;
+            if (!filePersistence)
+                return "Persistencia en local desactivado";
+            else
+                return "No hay suficiente espacio en el disco duro (2GB)";
         }
 
         switch (format)
@@ -44,11 +48,12 @@ public class Tracker
                 instance.persistenceObject.setSerializer(new JSONSerializer());
                 break;
             default:
-                instance.persistenceObject.setSerializer(new JSONSerializer());
-                break;
+                instance.persistenceObject = null;
+                return "Formato no reconozible";
         }
 
         instance.TrackEvent(new TrackerEvent("Session_Start", timeStamp));
+        return null;
     }
 
     public static void End(int timeStamp, bool flush = true) {
