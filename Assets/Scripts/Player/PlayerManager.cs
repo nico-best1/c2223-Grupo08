@@ -99,13 +99,14 @@ public class PlayerManager : MonoBehaviour
             _movementController.SetSlowFactor(_PlayerSize);
             _movementController.SetJumpFactor(_PlayerSize);
             GameManager.Instance.ResizeBallsBar(_PlayerSize);
+
+            if (Tracker.Instance != null)
+            {
+                float2 pos = new float2(transform.position.x, transform.position.y);
+                Tracker.Instance.TrackEvent(new ProgresionEvent2("Reduce_Size", (int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
+            }
         }
 
-        if (Tracker.Instance != null)
-        {
-            float2 pos = new float2(transform.position.x, transform.position.y);
-            Tracker.Instance.TrackEvent(new ProgresionEvent2("Reduce_Size", (int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
-        }
     }
 
     /// <summary>
