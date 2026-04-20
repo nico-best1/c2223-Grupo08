@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -134,7 +135,8 @@ public class GameManager : MonoBehaviour
         CheckBoxes(0);
 
         _uiManager.PlayStartTransition();
-        Tracker.Instance.TrackEvent(new ProgresionEvent("Level_Start", (int)Time.time, "level_" + level));
+        if (Tracker.Instance != null)
+            Tracker.Instance.TrackEvent(new ProgresionEvent("Level_Start", (int)Time.time, "level_" + level));
     }
 
     public int getLevel()
@@ -251,7 +253,8 @@ public class GameManager : MonoBehaviour
     ///<summary>
     public void ResetRoom()
     {
-        Tracker.Instance.TrackEvent(new ProgresionEvent2("Manual_Reset", (int)Time.time, "level_" + level, "room_"+_currentRoom));
+        float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
+        Tracker.Instance.TrackEvent(new ProgresionEvent2("Manual_Reset", (int)Time.time, "level_" + level, "room_"+_currentRoom, pos));
         Tracker.Instance.flush();
 
         if (_doors != null)
@@ -282,13 +285,16 @@ public class GameManager : MonoBehaviour
     ///<param name="door">La puerta entre la sala actual y la siguiente</param>
     public void passToNextRoom(DoorComponent door)
     {
-        Tracker.Instance.TrackEvent(new ProgresionEvent2("Room_Complete", (int)Time.time, "level_" + level, "room_" + _currentRoom));
+        float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
+        Tracker.Instance.TrackEvent(new ProgresionEvent2("Room_Complete", (int)Time.time, "level_" + level, "room_" + _currentRoom, pos));
         Tracker.Instance.flush();
         _currentRoom++;
         _playerManager.EnableInputs(false);
         _playerManager.resetSize();
         _playerManager.moveToNextRoom(_currentRoom, _cameraAreas.GetComponentsInChildren<CameraAreaScript>()[_currentRoom].ClosestPoint(_playerManager.getSpawnPoint(_currentRoom)), door);
-        Tracker.Instance.TrackEvent(new ProgresionEvent2("Room_Start", (int)Time.time, "level_" + level, "room_" + _currentRoom));
+
+        pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
+        Tracker.Instance.TrackEvent(new ProgresionEvent2("Room_Start", (int)Time.time, "level_" + level, "room_" + _currentRoom, pos));
     }
 
     ///<summary>
