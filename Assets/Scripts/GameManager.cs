@@ -253,9 +253,6 @@ public class GameManager : MonoBehaviour
     ///<summary>
     public void ResetRoom()
     {
-        float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
-        Tracker.Instance.TrackEvent(new ProgresionEvent2("Manual_Reset", (int)Time.time, "level_" + level, "room_"+_currentRoom, pos));
-        Tracker.Instance.flush();
 
         if (_doors != null)
             ResetDoors();

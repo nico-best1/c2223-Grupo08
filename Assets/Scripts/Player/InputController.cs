@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -171,6 +172,10 @@ public class InputController : MonoBehaviour
         if (Input.GetKey(ConfigScript.ButtonsCodes[Buttons.Reset]))
         {
             GameManager.Instance.FadeOut();
+
+            float2 pos = new float2(transform.position.x, transform.position.y);
+            Tracker.Instance.TrackEvent(new ProgresionEvent2("Manual_Reset", (int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
+            Tracker.Instance.flush();
         }
 
         if (Input.GetKeyDown(KeyCode.Escape) && !GameManager.Instance.isPaused)
