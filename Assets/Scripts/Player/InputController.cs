@@ -174,7 +174,7 @@ public class InputController : MonoBehaviour
             GameManager.Instance.FadeOut();
 
             float2 pos = new float2(transform.position.x, transform.position.y);
-            Tracker.Instance.TrackEvent(new ProgresionEvent2("Manual_Reset", (int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
+            Tracker.Instance.TrackEvent(new Manual_Reset((int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
             Tracker.Instance.flush();
         }
 

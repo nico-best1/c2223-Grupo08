@@ -14,9 +14,6 @@ public class Tracker
 {
     static Tracker instance = null;
 
-    // espacio minimo requerido en disco (2GB)
-    const long MINIMUM_SPACE_DISK = 2L * 1024 * 1024 * 1024;
-
     // objeto encargado de guardar los datos
     APersistence persistenceObject;
 
@@ -26,9 +23,6 @@ public class Tracker
     // contador de eventos enviados
     int eventCount;
 
-    // contador de archivos creados
-    int fileCount = 0;
-
     // metodo de inicializacion del tracker
     public static string Init(string sessionId, int timeStamp, string path, bool filePersistence = true, formatType format = formatType.JSON)
     {
@@ -37,26 +31,20 @@ public class Tracker
         instance = new Tracker();
         instance.sessionId = sessionId;
 
-        // se obtiene informacion del disco donde se guardaran los archivos
-        DriveInfo drive = new DriveInfo(Path.GetPathRoot(path));
-        long freeSpace = drive.AvailableFreeSpace;
-
         // se comprueba si se puede guardar en fichero y hay espacio suficiente
-        if (filePersistence && freeSpace > MINIMUM_SPACE_DISK)
+        if (filePersistence)
         {
             FilePersistence per = new FilePersistence();
             string filePath = "";
+            string date = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+            filePath = path + "/telemetry_" + sessionId + "_" + date;
 
             // si el formato es json
             if (format == formatType.JSON)
             {
                 // se genera un nombre de archivo unico
-                filePath = path + "/telemetry_" + instance.fileCount + ".json";
-                while (File.Exists(filePath))
-                {
-                    instance.fileCount++;
-                    filePath = path + "/telemetry_" + instance.fileCount + ".json";
-                }
+                filePath = filePath + ".json";
             }
             // si el formato es csv
             else if (format == formatType.CSV)
@@ -64,16 +52,19 @@ public class Tracker
                 UnityEngine.Debug.Log("CSV");
 
                 // se genera un nombre de archivo unico
-                filePath = path + "/telemetry_" + instance.fileCount + ".csv";
-                while (File.Exists(filePath))
-                {
-                    instance.fileCount++;
-                    filePath = path + "/telemetry_" + instance.fileCount + ".csv";
-                }
+                filePath = filePath + ".csv";
             }
 
-            // se configura la ruta donde se guardaran los datos
-            per.setPath(filePath);
+            try
+            {
+                // se configura la ruta donde se guardaran los datos
+                per.setPath(filePath);
+            }
+            catch (Exception e)
+            {
+                instance.persistenceObject = null;
+                return e.Message;
+            }
 
             // se asigna el sistema de persistencia
             instance.persistenceObject = per;
@@ -82,11 +73,7 @@ public class Tracker
         {
             // si no hay persistencia o espacio suficiente, no se guarda nada
             instance.persistenceObject = null;
-
-            if (!filePersistence)
-                return "persistencia en local desactivado";
-            else
-                return "no hay suficiente espacio en el disco duro (2gb)";
+            return "persistencia en local desactivado";
         }
 
         // se configura el tipo de serializador segun el formato elegido
@@ -106,7 +93,7 @@ public class Tracker
         }
 
         // se registra el evento de inicio de sesion
-        instance.TrackEvent(new TrackerEvent("Session_Start", timeStamp));
+        instance.TrackEvent(new Session_Start(timeStamp));
 
         return null;
     }
@@ -116,7 +103,7 @@ public class Tracker
     {
 
         // se registra el evento de fin de sesion
-        instance.TrackEvent(new TrackerEvent("Session_End", timeStamp));
+        instance.TrackEvent(new Session_End(timeStamp));
 
         // se fuerzan a guardar los datos pendientes
         if (flush)
@@ -156,7 +143,11 @@ public class Tracker
     // metodo para forzar el guardado de datos
     public void flush()
     {
-        if (persistenceObject != null)
-            persistenceObject.Flush();
+        try
+        {
+            if (persistenceObject != null)
+                persistenceObject.Flush();
+        }
+        catch(Exception e) { /* de momento se ignoran las excepciones */ }
     }
 }

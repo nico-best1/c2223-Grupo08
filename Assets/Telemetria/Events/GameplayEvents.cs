@@ -1,0 +1,79 @@
+using Unity.Mathematics;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+public class Player_Death : TrackerEvent
+{
+    public string level_id;
+    public string room_id;
+    public float2 player_position = new float2(0, 0);
+
+    public Player_Death(int timeStamp, string levelId, string roomId, float2 position) : base(timeStamp)
+    {
+        this.level_id = levelId;
+        this.room_id = roomId;
+        player_position = position;
+    }
+
+    public override string ToCSV()
+    {
+        return $"{base.ToCSV()},{level_id},{room_id},{player_position.x},{player_position.y}";
+    }
+}
+
+public class Manual_Reset : TrackerEvent
+{
+    public string level_id;
+    public string room_id;
+    public float2 player_position = new float2(0, 0);
+
+    public Manual_Reset(int timeStamp, string levelId, string roomId, float2 position) : base(timeStamp)
+    {
+        this.level_id = levelId;
+        this.room_id = roomId;
+        player_position = position;
+    }
+
+    public override string ToCSV()
+    {
+        return $"{base.ToCSV()},{level_id},{room_id},{player_position.x},{player_position.y}";
+    }
+}
+
+public class Reduce_Size : TrackerEvent
+{
+    public string level_id;
+    public string room_id;
+    public float2 player_position = new float2(0, 0);
+
+    public Reduce_Size(int timeStamp, string levelId, string roomId, float2 position) : base(timeStamp)
+    {
+        this.level_id = levelId;
+        this.room_id = roomId;
+        player_position = position;
+    }
+
+    public override string ToCSV()
+    {
+        return $"{base.ToCSV()},{level_id},{room_id},{player_position.x},{player_position.y}";
+    }
+}
+
+public class Increase_Size : TrackerEvent
+{
+    public string level_id;
+    public string room_id;
+    public float2 player_position = new float2(0, 0);
+
+    public Increase_Size(int timeStamp, string levelId, string roomId, float2 position) : base(timeStamp)
+    {
+        this.level_id = levelId;
+        this.room_id = roomId;
+        player_position = position;
+    }
+
+    public override string ToCSV()
+    {
+        return $"{base.ToCSV()},{level_id},{room_id},{player_position.x},{player_position.y}";
+    }
+}

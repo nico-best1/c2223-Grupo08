@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 
 public abstract class APersistence
 {
@@ -26,5 +27,6 @@ public abstract class APersistence
             index = 0;
     }
 
-    public abstract void Flush();
+    public abstract Task Flush();
+
 }

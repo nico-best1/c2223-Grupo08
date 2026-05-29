@@ -136,7 +136,7 @@ public class GameManager : MonoBehaviour
 
         _uiManager.PlayStartTransition();
         if (Tracker.Instance != null)
-            Tracker.Instance.TrackEvent(new ProgresionEvent("Level_Start", (int)Time.time, "level_" + level));
+            Tracker.Instance.TrackEvent(new Level_Start((int)Time.time, "level_" + level));
     }
 
     public int getLevel()
@@ -283,7 +283,7 @@ public class GameManager : MonoBehaviour
     public void passToNextRoom(DoorComponent door)
     {
         float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
-        Tracker.Instance.TrackEvent(new ProgresionEvent2("Room_Complete", (int)Time.time, "level_" + level, "room_" + _currentRoom, pos));
+        Tracker.Instance.TrackEvent(new Room_Complete((int)Time.time, "level_" + level, "room_" + _currentRoom, pos));
         Tracker.Instance.flush();
         _currentRoom++;
         _playerManager.EnableInputs(false);
@@ -291,7 +291,7 @@ public class GameManager : MonoBehaviour
         _playerManager.moveToNextRoom(_currentRoom, _cameraAreas.GetComponentsInChildren<CameraAreaScript>()[_currentRoom].ClosestPoint(_playerManager.getSpawnPoint(_currentRoom)), door);
 
         pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
-        Tracker.Instance.TrackEvent(new ProgresionEvent2("Room_Start", (int)Time.time, "level_" + level, "room_" + _currentRoom, pos));
+        Tracker.Instance.TrackEvent(new Room_Start((int)Time.time, "level_" + level, "room_" + _currentRoom, pos));
     }
 
     ///<summary>

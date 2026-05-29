@@ -82,7 +82,7 @@ public class PlayerManager : MonoBehaviour
 
 
         float2 pos = new float2(transform.position.x, transform.position.y);
-        Tracker.Instance.TrackEvent(new ProgresionEvent2("Increase_Size", (int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
+        Tracker.Instance.TrackEvent(new Increase_Size((int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public class PlayerManager : MonoBehaviour
             if (Tracker.Instance != null)
             {
                 float2 pos = new float2(transform.position.x, transform.position.y);
-                Tracker.Instance.TrackEvent(new ProgresionEvent2("Reduce_Size", (int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
+                Tracker.Instance.TrackEvent(new Reduce_Size((int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
             }
         }
 
