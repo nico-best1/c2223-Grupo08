@@ -31,7 +31,6 @@ public class Tracker
         instance = new Tracker();
         instance.sessionId = sessionId;
 
-        // se comprueba si se puede guardar en fichero y hay espacio suficiente
         if (filePersistence)
         {
             FilePersistence per = new FilePersistence();
