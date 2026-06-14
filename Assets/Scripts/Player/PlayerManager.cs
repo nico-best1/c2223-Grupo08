@@ -80,9 +80,6 @@ public class PlayerManager : MonoBehaviour
         _movementController.SetJumpFactor(_PlayerSize);
         GameManager.Instance.ResizeBallsBar(_PlayerSize);
 
-
-        float2 pos = new float2(transform.position.x, transform.position.y);
-        Tracker.Instance.TrackEvent(new Increase_Size((int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
     }
 
     /// <summary>
@@ -100,13 +97,7 @@ public class PlayerManager : MonoBehaviour
             _movementController.SetJumpFactor(_PlayerSize);
             GameManager.Instance.ResizeBallsBar(_PlayerSize);
 
-            if (Tracker.Instance != null)
-            {
-                float2 pos = new float2(transform.position.x, transform.position.y);
-                Tracker.Instance.TrackEvent(new Reduce_Size((int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
-            }
         }
-
     }
 
     /// <summary>
