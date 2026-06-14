@@ -50,7 +50,7 @@ public class LiveComponent : MonoBehaviour
 
         float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
         Tracker.Instance.TrackEvent(new Player_Death((int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
-        Tracker.Instance.flush();
+        Tracker.Instance.Flush();
     }
 
     /// <summary>

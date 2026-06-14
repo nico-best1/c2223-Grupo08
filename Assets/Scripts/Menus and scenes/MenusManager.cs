@@ -97,7 +97,7 @@ public class MenusManager : MonoBehaviour
         menuState = MenuState.PauseMenu;
         GameManager.Instance.PauseSounds();
         GameManager.Instance.isPaused = true;
-        Tracker.Instance.flush();
+        Tracker.Instance.Flush();
     }
 
     /// <summary>

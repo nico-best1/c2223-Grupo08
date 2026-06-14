@@ -9,10 +9,19 @@ public enum formatType
     JSON, CSV
 }
 
-// clase principal encargada de registrar eventos
+// clase principal Singleton encargada de registrar eventos
 public class Tracker
 {
-    static Tracker instance = null;
+    //evitar llamadas al constructor con new
+    private Tracker() { }
+
+    //unica instancia del tracker
+    private static Tracker instance = null;
+
+    public static Tracker Instance
+    {
+        get { return instance; }
+    }
 
     // objeto encargado de guardar los datos
     APersistence persistenceObject;
@@ -106,15 +115,10 @@ public class Tracker
 
         // se fuerzan a guardar los datos pendientes
         if (flush)
-            instance.flush();
+            instance.Flush();
 
         // se elimina la instancia
         instance = null;
-    }
-
-    public static Tracker Instance
-    {
-        get { return instance; }
     }
 
     // metodo para registrar un evento
@@ -140,7 +144,7 @@ public class Tracker
     }
 
     // metodo para forzar el guardado de datos
-    public void flush()
+    public void Flush()
     {
         try
         {

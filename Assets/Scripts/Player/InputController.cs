@@ -175,7 +175,7 @@ public class InputController : MonoBehaviour
 
             float2 pos = new float2(transform.position.x, transform.position.y);
             Tracker.Instance.TrackEvent(new Room_Complete((int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos, true));
-            Tracker.Instance.flush();
+            Tracker.Instance.Flush();
         }
 
         if (Input.GetKeyDown(KeyCode.Escape) && !GameManager.Instance.isPaused)
