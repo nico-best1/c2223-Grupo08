@@ -11,6 +11,18 @@ public class TrackerManager : MonoBehaviour
     [SerializeField]
     formatType format = formatType.JSON;
 
+    void Awake()
+    {
+        if (tracker == null)
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject); // Elimina el duplicado
+        }
+    }
+
     // metodo que se ejecuta al iniciar el objeto
     void Start()
     {
