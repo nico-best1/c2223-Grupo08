@@ -3,6 +3,8 @@ using UnityEngine;
 // clase que gestiona el tracker dentro de unity
 public class TrackerManager : MonoBehaviour
 {
+    Tracker tracker = null;
+
     // indica si se guardaran datos en fichero
     [SerializeField]
     bool filePersistence = true;
@@ -41,6 +43,7 @@ public class TrackerManager : MonoBehaviour
             if (error != null)
                 Debug.LogWarning(error);
         }
+        tracker = Tracker.Instance;
     }
 
     // metodo que se ejecuta al cerrar la aplicacion
@@ -48,5 +51,6 @@ public class TrackerManager : MonoBehaviour
     {
         // se finaliza la sesion del tracker
         Tracker.End((int)Time.time);
+        tracker = null;
     }
 }
