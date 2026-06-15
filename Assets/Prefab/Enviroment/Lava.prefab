@@ -101,6 +101,7 @@ MonoBehaviour:
   layer:
     serializedVersion: 2
     m_Bits: 8
+  cause: Lava
 --- !u!61 &4365665206931720951
 BoxCollider2D:
   m_ObjectHideFlags: 0

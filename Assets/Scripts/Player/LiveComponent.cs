@@ -47,10 +47,6 @@ public class LiveComponent : MonoBehaviour
         _playerManager.EnableInputs(false);
         _playerAnimator.IsDeath(true);
         Invoke("PlayDeath", 1);
-
-        float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
-        Tracker.Instance.TrackEvent(new Player_Death((int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos));
-        Tracker.Instance.Flush();
     }
 
     /// <summary>

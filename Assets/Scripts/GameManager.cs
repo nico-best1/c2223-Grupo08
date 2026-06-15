@@ -274,6 +274,11 @@ public class GameManager : MonoBehaviour
         _playerManager.SetAlive(true);
 
         _uiManager.FadeIn();
+
+        float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
+        Tracker.Instance.TrackEvent(new Room_Start((int)Time.time, "level_" + level, "room_" + _currentRoom, pos));
+
+        Tracker.Instance.Flush();
     }
 
     ///<summary>
@@ -284,7 +289,6 @@ public class GameManager : MonoBehaviour
     {
         float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
         Tracker.Instance.TrackEvent(new Room_Complete((int)Time.time, "level_" + level, "room_" + _currentRoom, pos, false));
-        Tracker.Instance.Flush();
         _currentRoom++;
         _playerManager.EnableInputs(false);
         _playerManager.resetSize();
@@ -292,6 +296,8 @@ public class GameManager : MonoBehaviour
 
         pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
         Tracker.Instance.TrackEvent(new Room_Start((int)Time.time, "level_" + level, "room_" + _currentRoom, pos));
+
+        Tracker.Instance.Flush();
     }
 
     ///<summary>

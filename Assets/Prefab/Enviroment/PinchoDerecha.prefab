@@ -48,6 +48,7 @@ MonoBehaviour:
   layer:
     serializedVersion: 2
     m_Bits: 8
+  cause: Pincho
 --- !u!61 &6441886267083619470
 BoxCollider2D:
   m_ObjectHideFlags: 0
