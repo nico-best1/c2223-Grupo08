@@ -64,18 +64,16 @@ public class Room_Complete : TrackerEvent
     public string level_id;
     public string room_id;
     public float2 player_position = new float2(0, 0);
-    public bool reset = false;
 
-    public Room_Complete(string levelId, string roomId, float2 position, bool reset) : base()
+    public Room_Complete(string levelId, string roomId, float2 position) : base()
     {
         this.level_id = levelId;
         this.room_id = roomId;
         player_position = position;
-        this.reset = reset;
     }
 
     public override string ToCSV()
     {
-        return $"{base.ToCSV()},{level_id},{room_id},{player_position.x},{player_position.y},{reset}";
+        return $"{base.ToCSV()},{level_id},{room_id},{player_position.x},{player_position.y}";
     }
 }

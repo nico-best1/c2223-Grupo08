@@ -293,7 +293,7 @@ public class GameManager : MonoBehaviour
     public void passToNextRoom(DoorComponent door)
     {
         float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
-        Tracker.Instance.TrackEvent(new Room_Complete("level_" + level, "room_" + _currentRoom, pos, false)); // reset=false: cambio normal de sala
+        Tracker.Instance.TrackEvent(new Room_Complete("level_" + level, "room_" + _currentRoom, pos));
         _currentRoom++;
         _playerManager.EnableInputs(false);
         _playerManager.resetSize();

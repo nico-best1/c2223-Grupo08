@@ -71,7 +71,7 @@ for i in range(max_files):
             elif event_type == "Level_Complete":
                 if start_times[level_id]:
                     start_time = start_times[level_id].pop(0)
-                    duration = timestamp - start_time
+                    duration = (timestamp - start_time) / 1000
                     if duration > 0:
                         total_time[level_id] += duration
 
