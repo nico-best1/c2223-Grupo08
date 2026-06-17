@@ -12,6 +12,10 @@ public class TrackerManager : MonoBehaviour
     [SerializeField]
     formatType format = formatType.JSON;
 
+    // lista de eventos desactivados al inicio (configurable desde el Inspector)
+    [SerializeField]
+    private System.Collections.Generic.List<string> disabledEventsAtStart = new System.Collections.Generic.List<string>();
+
     void Awake()
     {
         if (Tracker.Instance == null)
@@ -36,11 +40,19 @@ public class TrackerManager : MonoBehaviour
             string sessionId = System.Guid.NewGuid().ToString();
 
             // se inicializa el tracker
-            string error = Tracker.Init(sessionId, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), path, filePersistence, format);
+            string error = Tracker.Init(sessionId, path, filePersistence, format);
 
             // si hay error, se muestra por consola
             if (error != null)
                 Debug.LogWarning(error);
+            else
+            {
+                // desactivar eventos segun configuracion del inspector
+                foreach (string eventType in disabledEventsAtStart)
+                {
+                    Tracker.Instance.DisableEvent(eventType);
+                }
+            }
         }
     }
 
@@ -48,6 +60,6 @@ public class TrackerManager : MonoBehaviour
     void OnApplicationQuit()
     {
         // se finaliza la sesion del tracker
-        Tracker.End(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+        Tracker.End();
     }
 }

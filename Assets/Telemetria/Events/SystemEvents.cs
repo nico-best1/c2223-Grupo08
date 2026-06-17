@@ -4,19 +4,19 @@ using UnityEngine.UIElements;
 
 public class Session_Start : TrackerEvent
 {
-    public Session_Start(long timeStamp) : base(timeStamp) { }
+    public Session_Start() : base() { }
 }
 
 public class Session_End : TrackerEvent
 {
-    public Session_End(long timeStamp) : base(timeStamp) { }
+    public Session_End() : base() { }
 }
 
 public class Level_Start : TrackerEvent
 {
     public string level_id;
 
-    public Level_Start(long timeStamp, string levelId) : base(timeStamp)
+    public Level_Start(string levelId) : base()
     {
         this.level_id = levelId;
     }
@@ -31,7 +31,7 @@ public class Level_Complete : TrackerEvent
 {
     public string level_id;
 
-    public Level_Complete(long timeStamp, string levelId) : base(timeStamp)
+    public Level_Complete(string levelId) : base()
     {
         this.level_id = levelId;
     }
@@ -47,7 +47,7 @@ public class Room_Start : TrackerEvent
     public string level_id;
     public string room_id;
 
-    public Room_Start(long timeStamp, string levelId, string roomId) : base(timeStamp)
+    public Room_Start(string levelId, string roomId) : base()
     {
         this.level_id = levelId;
         this.room_id = roomId;
@@ -66,7 +66,7 @@ public class Room_Complete : TrackerEvent
     public float2 player_position = new float2(0, 0);
     public bool reset = false;
 
-    public Room_Complete(long timeStamp, string levelId, string roomId, float2 position, bool reset) : base(timeStamp)
+    public Room_Complete(string levelId, string roomId, float2 position, bool reset) : base()
     {
         this.level_id = levelId;
         this.room_id = roomId;

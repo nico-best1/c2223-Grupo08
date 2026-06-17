@@ -63,15 +63,27 @@ public class FilePersistence : APersistence
         if (drive.AvailableFreeSpace < MINIMUM_SPACE_TO_WRITE)
             throw new IOException("Espacio insuficiente en disco para continuar escribiendo (mínimo 100MB)");
 
+        // Copiar eventos bajo lock para evitar race conditions con Send()
+        System.Collections.Generic.List<string> serializedEvents = new System.Collections.Generic.List<string>();
+        lock (lockObject)
+        {
+            for (int i = MaxBuffer + index - eventSize; i < MaxBuffer + index; i++)
+            {
+                serializedEvents.Add(this.serializer.serialize(events[i % MaxBuffer]));
+            }
+            eventSize = 0;
+        }
+
         try
         {
             // Esperar al flush anterior antes de empezar el siguiente
             if (pendingFlush != null)
                 await pendingFlush;
 
-            for (int i = MaxBuffer + index - eventSize; i < MaxBuffer + index; i++)
+            // Escribir fuera del lock para no bloquear el hilo principal
+            foreach (var line in serializedEvents)
             {
-                writer.WriteLine(this.serializer.serialize(events[i % MaxBuffer]));
+                writer.WriteLine(line);
             }
 
             // Lanzar flush sin esperar
@@ -82,9 +94,6 @@ public class FilePersistence : APersistence
             // Error específico de disco lleno (ERROR_DISK_FULL)
             CloseStream();
             throw new IOException("Disco lleno: no se pudieron guardar los eventos.", ex);
-        }
-        finally {
-            eventSize = 0; 
         }
     }
 

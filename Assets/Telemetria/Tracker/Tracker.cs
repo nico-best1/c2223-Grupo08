@@ -32,8 +32,26 @@ public class Tracker
     // contador de eventos enviados
     int eventCount;
 
+    // Control selectivo para activacion o desactivacion de eventos en caliente
+    private System.Collections.Generic.HashSet<string> disabledEvents = new System.Collections.Generic.HashSet<string>();
+
+    public void DisableEvent(string eventType)
+    {
+        disabledEvents.Add(eventType);
+    }
+
+    public void EnableEvent(string eventType)
+    {
+        disabledEvents.Remove(eventType);
+    }
+
+    public bool IsEventEnabled(string eventType)
+    {
+        return !disabledEvents.Contains(eventType);
+    }
+
     // metodo de inicializacion del tracker
-    public static string Init(string sessionId, long timeStamp, string path, bool filePersistence = true, formatType format = formatType.JSON)
+    public static string Init(string sessionId, string path, bool filePersistence = true, formatType format = formatType.JSON)
     {
 
         // se crea la instancia del tracker
@@ -101,17 +119,17 @@ public class Tracker
         }
 
         // se registra el evento de inicio de sesion
-        instance.TrackEvent(new Session_Start(timeStamp));
+        instance.TrackEvent(new Session_Start());
 
         return null;
     }
 
     // metodo para finalizar la sesion
-    public static void End(long timeStamp, bool flush = true)
+    public static void End(bool flush = true)
     {
 
         // se registra el evento de fin de sesion
-        instance.TrackEvent(new Session_End(timeStamp));
+        instance.TrackEvent(new Session_End());
 
         // se fuerzan a guardar los datos pendientes
         if (flush)
@@ -129,12 +147,17 @@ public class Tracker
         if (persistenceObject == null)
             return;
 
+        // Filtro para ignorar eventos desactivados desde el inspector o configuracion
+        if (disabledEvents.Contains(e.eventType))
+            return;
+
         // se genera un id unico para el evento
         string eventId = "event_" + eventCount;
 
-        // se asignan datos al evento
+        // Se asignan datos comunes de forma automatica reduciendo acoplamiento
         e.setSessionId(sessionId);
         e.setEventId(eventId);
+        e.setGameId("slime_escape");
 
         // se envia el evento al sistema de guardado
         persistenceObject.Send(e);

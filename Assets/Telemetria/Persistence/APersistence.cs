@@ -7,6 +7,7 @@ public abstract class APersistence
     protected TrackerEvent[] events = new TrackerEvent[MaxBuffer];
     protected ISerializer serializer;
     protected int eventSize = 0;
+    protected readonly object lockObject = new object(); // Sincronizacion para volcado asincrono
 
     public void setSerializer(ISerializer s)
     {
@@ -15,16 +16,18 @@ public abstract class APersistence
 
     public void Send(TrackerEvent e)
     {
+        lock (lockObject) // Proteger buffer circular ante acceso concurrente
+        {
+            if(eventSize<MaxBuffer)
+                eventSize++;
 
-        if(eventSize<MaxBuffer)
-            eventSize++;
+            events[index] = e;
 
-        events[index] = e;
-
-        if (index < MaxBuffer - 1)
-            index++;
-        else
-            index = 0;
+            if (index < MaxBuffer - 1)
+                index++;
+            else
+                index = 0;
+        }
     }
 
     public abstract Task Flush();
