@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -98,7 +99,7 @@ public class GameManager : MonoBehaviour
     public bool isPaused = false;
 
     /// <summary>
-    /// Indica si esta enseñando la puerta abriendose
+    /// Indica si esta enseï¿½ando la puerta abriendose
     /// </summary>
     public bool IsShowingOpenDoor = false;
 
@@ -137,8 +138,8 @@ public class GameManager : MonoBehaviour
         _uiManager.PlayStartTransition();
         if (Tracker.Instance != null)
         {
-            Tracker.Instance.TrackEvent(new Level_Start((int)Time.time, "level_" + level));
-            Tracker.Instance.TrackEvent(new Room_Start((int)Time.time, "level_" + level, "room_" + _currentRoom));
+            Tracker.Instance.TrackEvent(new Level_Start(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), "level_" + level));
+            Tracker.Instance.TrackEvent(new Room_Start(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), "level_" + level, "room_" + _currentRoom));
         }
 
     }
@@ -156,7 +157,7 @@ public class GameManager : MonoBehaviour
     ///<summary>
     ///Comprueba en cada caja si debe liberarse o no
     ///</summary>
-    ///<param name="size">El tamaño del jugador</param>
+    ///<param name="size">El tamaï¿½o del jugador</param>
     public void CheckBoxes(int size) {
         BoxManager[] boxManagers = _boxes.GetComponentsInChildren<BoxManager>();
         if (boxManagers.Length != 0)
@@ -169,7 +170,7 @@ public class GameManager : MonoBehaviour
     }
 
     ///<summary>
-    ///Reinicia las cajas a su posición inicial
+    ///Reinicia las cajas a su posiciï¿½n inicial
     ///</summary>
     public void ResetBoxes()
     {
@@ -184,7 +185,7 @@ public class GameManager : MonoBehaviour
     }
 
     ///<summary>
-    ///Reinicia las bolas a su posición inicial
+    ///Reinicia las bolas a su posiciï¿½n inicial
     ///<summary>
     public void ResetBalls()
     {
@@ -199,7 +200,7 @@ public class GameManager : MonoBehaviour
     }
 
     ///<summary>
-    ///Reinicia las botones a su posición inicial
+    ///Reinicia las botones a su posiciï¿½n inicial
     ///<summary>
     public void ResetButtons()
     {
@@ -229,7 +230,7 @@ public class GameManager : MonoBehaviour
     }
 
     ///<summary>
-    ///Reinicia las botones a su posición inicial
+    ///Reinicia las botones a su posiciï¿½n inicial
     ///<summary>
     public void ResetSaws()
     {
@@ -279,7 +280,7 @@ public class GameManager : MonoBehaviour
 
         _uiManager.FadeIn();
 
-        Tracker.Instance.TrackEvent(new Room_Start((int)Time.time, "level_" + level, "room_" + _currentRoom));
+        Tracker.Instance.TrackEvent(new Room_Start(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), "level_" + level, "room_" + _currentRoom));
 
         Tracker.Instance.Flush();
     }
@@ -291,13 +292,13 @@ public class GameManager : MonoBehaviour
     public void passToNextRoom(DoorComponent door)
     {
         float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
-        Tracker.Instance.TrackEvent(new Room_Complete((int)Time.time, "level_" + level, "room_" + _currentRoom, pos, false));
+        Tracker.Instance.TrackEvent(new Room_Complete(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), "level_" + level, "room_" + _currentRoom, pos, false));
         _currentRoom++;
         _playerManager.EnableInputs(false);
         _playerManager.resetSize();
         _playerManager.moveToNextRoom(_currentRoom, _cameraAreas.GetComponentsInChildren<CameraAreaScript>()[_currentRoom].ClosestPoint(_playerManager.getSpawnPoint(_currentRoom)), door);
 
-        Tracker.Instance.TrackEvent(new Room_Start((int)Time.time, "level_" + level, "room_" + _currentRoom));
+        Tracker.Instance.TrackEvent(new Room_Start(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), "level_" + level, "room_" + _currentRoom));
 
         Tracker.Instance.Flush();
     }

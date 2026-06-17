@@ -57,7 +57,7 @@ public class SceneLoadManager : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Tracker.Instance.TrackEvent(new Level_Complete((int)Time.time, "level_" + GameManager.Instance.getLevel()));
+        Tracker.Instance.TrackEvent(new Level_Complete(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), "level_" + GameManager.Instance.getLevel()));
         Tracker.Instance.Flush();
         PlayerManager.Instance.EnableInputs(false);
         _playerAnimator.PlayLoadSceneAnimation();

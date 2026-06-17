@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 // clase que gestiona el tracker dentro de unity
@@ -35,7 +36,7 @@ public class TrackerManager : MonoBehaviour
             string sessionId = System.Guid.NewGuid().ToString();
 
             // se inicializa el tracker
-            string error = Tracker.Init(sessionId, (int)Time.time, path, filePersistence, format);
+            string error = Tracker.Init(sessionId, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), path, filePersistence, format);
 
             // si hay error, se muestra por consola
             if (error != null)
@@ -47,6 +48,6 @@ public class TrackerManager : MonoBehaviour
     void OnApplicationQuit()
     {
         // se finaliza la sesion del tracker
-        Tracker.End((int)Time.time);
+        Tracker.End(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
     }
 }

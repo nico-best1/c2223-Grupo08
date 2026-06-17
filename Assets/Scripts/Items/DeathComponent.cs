@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -21,7 +22,7 @@ public class DeathComponent : MonoBehaviour
 
 
             float2 pos = new float2(PlayerManager.Instance.transform.position.x, PlayerManager.Instance.transform.position.y);
-            Tracker.Instance.TrackEvent(new Player_Death((int)Time.time, "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos, cause));
+            Tracker.Instance.TrackEvent(new Player_Death(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), "level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos, cause));
             Tracker.Instance.Flush();
         }
     }

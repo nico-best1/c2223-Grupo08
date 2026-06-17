@@ -33,7 +33,7 @@ public class Tracker
     int eventCount;
 
     // metodo de inicializacion del tracker
-    public static string Init(string sessionId, int timeStamp, string path, bool filePersistence = true, formatType format = formatType.JSON)
+    public static string Init(string sessionId, long timeStamp, string path, bool filePersistence = true, formatType format = formatType.JSON)
     {
 
         // se crea la instancia del tracker
@@ -107,7 +107,7 @@ public class Tracker
     }
 
     // metodo para finalizar la sesion
-    public static void End(int timeStamp, bool flush = true)
+    public static void End(long timeStamp, bool flush = true)
     {
 
         // se registra el evento de fin de sesion

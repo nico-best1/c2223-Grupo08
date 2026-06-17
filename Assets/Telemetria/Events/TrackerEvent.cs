@@ -6,9 +6,9 @@ public class TrackerEvent
     public string eventType;
     public string sessionId;
     public string eventId;
-    public int timeStamp;
+    public long timeStamp;
 
-    public TrackerEvent(int timeStamp)
+    public TrackerEvent(long timeStamp)
     {
         this.eventType = this.GetType().Name;
         this.timeStamp = timeStamp;
