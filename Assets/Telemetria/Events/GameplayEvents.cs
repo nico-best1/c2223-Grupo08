@@ -19,6 +19,6 @@ public class Player_Death : TrackerEvent
 
     public override string ToCSV()
     {
-        return $"{base.ToCSV()},{level_id},{room_id},{player_position.x},{player_position.y}, {cause}";
+        return $"{base.ToCSV()},{level_id},{room_id},{player_position.x},{player_position.y},{cause}";
     }
 }

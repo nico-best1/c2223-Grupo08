@@ -11,6 +11,7 @@ public class TrackerEvent
     public TrackerEvent(int timeStamp)
     {
         this.eventType = this.GetType().Name;
+        this.timeStamp = timeStamp;
     }
 
     public void setSessionId(string id) { sessionId = id; }
