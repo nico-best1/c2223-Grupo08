@@ -62,6 +62,7 @@ public class SceneLoadManager : MonoBehaviour
         PlayerManager.Instance.EnableInputs(false);
         _playerAnimator.PlayLoadSceneAnimation();
         LoadNextScene();
+        gameObject.SetActive(false);
     }
     
 }
