@@ -22,7 +22,7 @@ public class DeathComponent : MonoBehaviour
 
 
             float2 pos = new float2(PlayerManager.Instance.transform.position.x, PlayerManager.Instance.transform.position.y);
-            Tracker.Instance.TrackEvent(new Player_Death("level_" + GameManager.Instance.getLevel(), "room_" + GameManager.Instance.getRoom(), pos, cause));
+            Tracker.Instance.TrackEvent(new Player_Death("level_" + GameManager.Instance.getLevel(), "room_" + (GameManager.Instance.getRoom()+1), pos, cause));
             Tracker.Instance.Flush();
         }
     }
