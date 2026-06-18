@@ -69,7 +69,7 @@ public class Room_Complete : TrackerEvent
     {
         this.level_id = levelId;
         this.room_id = roomId;
-        player_position = position;
+        this.player_position = position;
     }
 
     public override string ToCSV()

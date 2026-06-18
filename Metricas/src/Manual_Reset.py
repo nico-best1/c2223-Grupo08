@@ -1,7 +1,6 @@
 import json
 import os
 import matplotlib.pyplot as plt
-from collections import Counter
 
 os.makedirs("graficos", exist_ok=True)
 
@@ -9,11 +8,19 @@ os.makedirs("graficos", exist_ok=True)
 base_filename = "telemetria/telemetry_{}.json"
 max_files = 100  # Ajusta según necesidad
 
-# Levels posibles (fijos)
-valid_levels = ["level_1", "level_2", "level_3", "level_4"]
+# Diccionario con salas y niveles
+rooms_per_level = {
+    "level_1": ["room_1", "room_2", "room_3"],
+    "level_2": ["room_1", "room_2", "room_3", "room_4", "room_5"],
+    "level_3": ["room_1", "room_2", "room_3"],
+    "level_4": ["room_1", "room_2"]
+}
 
-# Inicializar contador con 0 para todos
-level_counter = Counter({level: 0 for level in valid_levels})
+# Inicializar contador con 0 para todas las salas de todos los niveles
+room_counter = {
+    level: {room: 0 for room in rooms}
+    for level, rooms in rooms_per_level.items()
+}
 
 # Leer archivos
 files_read = 0
@@ -59,25 +66,34 @@ for i in range(max_files):
                 event.get("eventType") == "Manual_Reset"
             ):
                 level_id = event.get("level_id")
+                room_id = event.get("room_id")
 
-                if level_id in valid_levels:
-                    level_counter[level_id] += 1
+                # Validar que el nivel y la sala existen en nuestro diccionario
+                if level_id in rooms_per_level and room_id in rooms_per_level[level_id]:
+                    room_counter[level_id][room_id] += 1
 
-# Preparar datos SIEMPRE (aunque sean 0)
-levels = valid_levels
-counts = [level_counter[level] for level in levels]
+# Preparar datos
+labels = []
+counts = []
+
+for level, rooms in rooms_per_level.items():
+    for room in rooms:
+        # Formateamos las etiquetas para que sean legibles, ej: "L1 - R1"
+        label = f"{level.replace('level_', 'L')} - {room.replace('room_', 'R')}"
+        labels.append(label)
+        counts.append(room_counter[level][room])
 
 # Debug útil
 print(f"Archivos leídos: {files_read}")
 print(f"Total Manual_Reset: {sum(counts)}")
 
 # Crear gráfico (aunque todo sea 0)
-plt.figure()
-plt.bar(levels, counts)
-plt.xlabel("Level ID")
+plt.figure(figsize=(10, 6))
+plt.bar(labels, counts, color='skyblue', edgecolor='black')
+plt.xlabel("Nivel y Sala")
 plt.ylabel("Número de veces (Manual_Reset)")
-plt.title("Numero de resets por nivel")
+plt.title("Numero de resets por sala")
 plt.xticks(rotation=45)
 
 plt.tight_layout()
-plt.savefig("graficos/grafico_resets.png")
+plt.savefig("graficos/grafico_resets_por_sala.png")
