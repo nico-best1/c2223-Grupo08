@@ -139,7 +139,7 @@ public class GameManager : MonoBehaviour
         if (Tracker.Instance != null)
         {
             Tracker.Instance.TrackEvent(new Level_Start("level_" + level));
-            Tracker.Instance.TrackEvent(new Room_Start("level_" + level, "room_" + _currentRoom+1));
+            Tracker.Instance.TrackEvent(new Room_Start("level_" + level, "room_" + (_currentRoom+1)));
         }
 
     }
@@ -281,7 +281,7 @@ public class GameManager : MonoBehaviour
         _uiManager.FadeIn();
 
         // Timestamp calculado internamente por TrackerEvent
-        Tracker.Instance.TrackEvent(new Room_Start("level_" + level, "room_" + _currentRoom+1));
+        Tracker.Instance.TrackEvent(new Room_Start("level_" + level, "room_" + (_currentRoom+1)));
 
         Tracker.Instance.Flush();
     }
@@ -292,14 +292,13 @@ public class GameManager : MonoBehaviour
     ///<param name="door">La puerta entre la sala actual y la siguiente</param>
     public void passToNextRoom(DoorComponent door)
     {
-        float2 pos = new float2(_playerManager.transform.position.x, _playerManager.transform.position.y);
-        Tracker.Instance.TrackEvent(new Room_Complete("level_" + level, "room_" + _currentRoom+1, pos));
+        Tracker.Instance.TrackEvent(new Room_Complete("level_" + level, "room_" + (_currentRoom+1)));
         _currentRoom++;
         _playerManager.EnableInputs(false);
         _playerManager.resetSize();
         _playerManager.moveToNextRoom(_currentRoom, _cameraAreas.GetComponentsInChildren<CameraAreaScript>()[_currentRoom].ClosestPoint(_playerManager.getSpawnPoint(_currentRoom)), door);
 
-        Tracker.Instance.TrackEvent(new Room_Start("level_" + level, "room_" + _currentRoom+1));
+        Tracker.Instance.TrackEvent(new Room_Start("level_" + level, "room_" + (_currentRoom+1)));
 
         Tracker.Instance.Flush();
     }

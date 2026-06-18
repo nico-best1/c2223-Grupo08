@@ -1,6 +1,7 @@
 import json
 import os
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 # Configuración
 telemetry_dir = "telemetria"
@@ -13,8 +14,12 @@ rooms_per_level = {
     "level_4": ["room_1", "room_2"]
 }
 
-# Inicializar contador con 0 para todas las salas de todos los niveles
-room_counter = {
+# Guardamos tiempos
+start_times = {
+    level: {room: [] for room in rooms}
+    for level, rooms in rooms_per_level.items()
+}
+total_time = {
     level: {room: 0 for room in rooms}
     for level, rooms in rooms_per_level.items()
 }
@@ -40,9 +45,9 @@ def parse_concatenated_json(content):
 
     return objects
 
-# Leer archivos
 files_read = 0
 
+# Leer archivos
 if os.path.exists(telemetry_dir):
     for filename in os.listdir(telemetry_dir):
         if filename.endswith(".json"):
@@ -53,19 +58,36 @@ if os.path.exists(telemetry_dir):
                 content = f.read()
                 events = parse_concatenated_json(content)
 
-                # Recorrer eventos buscando el reinicio manual
                 for event in events:
-                    if isinstance(event, dict) and event.get("eventType") == "Manual_Reset":
-                        level_id = event.get("level_id")
-                        room_id = event.get("room_id")
+                    if not isinstance(event, dict):
+                        continue
 
-                        # Validar que el nivel y la sala existen en nuestro diccionario
-                        if level_id in rooms_per_level and room_id in rooms_per_level[level_id]:
-                            room_counter[level_id][room_id] += 1
+                    event_type = event.get("eventType")
+                    level_id = event.get("level_id")
+                    room_id = event.get("room_id")
+                    timestamp = event.get("timeStamp")
+
+                    if level_id not in rooms_per_level or room_id not in rooms_per_level[level_id] or timestamp is None:
+                        continue
+
+                    # Guardar inicio
+                    if event_type == "Room_Start":
+                        start_times[level_id][room_id].append(timestamp)
+
+                    # Calcular duración al completar la sala O al morir
+                    elif event_type in ["Room_Complete", "Player_Death"]:
+                        if start_times[level_id][room_id]:
+                            start_time = start_times[level_id][room_id].pop(-1)
+                            start_times[level_id][room_id].clear()
+                            
+                            duration = (timestamp - start_time) / 1000
+                            if duration > 0:
+                                total_time[level_id][room_id] += duration
 else:
     print(f"Error: No se encontró la carpeta '{telemetry_dir}'")
 
-# Preparar datos
+
+# Preparar datos para gráfico
 labels = []
 counts = []
 
@@ -74,21 +96,22 @@ for level, rooms in rooms_per_level.items():
         # Formateamos las etiquetas para que sean legibles, ej: "L1 - R1"
         label = f"{level.replace('level_', 'L')} - {room.replace('room_', 'R')}"
         labels.append(label)
-        counts.append(room_counter[level][room])
+        counts.append(total_time[level][room])
 
-# Debug útil
+
 print(f"Archivos leídos: {files_read}")
-print(f"Total Manual_Reset: {sum(counts)}")
+print("Tiempo total por nivel:", dict(total_time))
 
+# Crear carpeta si no existe
 os.makedirs("graficos", exist_ok=True)
 
-# Crear gráfico (aunque todo sea 0)
+# Gráfico
 plt.figure(figsize=(10, 6))
 plt.bar(labels, counts, color='skyblue', edgecolor='black')
 plt.xlabel("Nivel y Sala")
-plt.ylabel("Número de veces (Manual_Reset)")
-plt.title("Numero de resets por sala")
+plt.ylabel("Tiempo total (s)")
+plt.title("Tiempo total por sala (Room_Start → Room_Complete)")
 plt.xticks(rotation=45)
 
 plt.tight_layout()
-plt.savefig("graficos/grafico_resets_por_sala.png")
+plt.savefig("graficos/grafico_tiempo_por_sala.png")
