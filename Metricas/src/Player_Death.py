@@ -1,83 +1,100 @@
 import json
 import os
 import matplotlib.pyplot as plt
-from collections import Counter
 
-os.makedirs("graficos", exist_ok=True)
+# Directorio donde están los JSON
+telemetry_dir = "telemetria"
 
-# Configuración
-base_filename = "telemetria/telemetry_{}.json"
-max_files = 100  # Ajusta según necesidad
+# Diccionario con salas y niveles
+rooms_per_level = {
+    "level_1": ["room_1", "room_2", "room_3"],
+    "level_2": ["room_1", "room_2", "room_3", "room_4", "room_5"],
+    "level_3": ["room_1", "room_2", "room_3"],
+    "level_4": ["room_1", "room_2"]
+}
 
-# Levels posibles (fijos)
-valid_levels = ["level_1", "level_2", "level_3", "level_4"]
+# Inicializar contador con 0 para todas las salas
+room_counter = {
+    level: {room: 0 for room in rooms}
+    for level, rooms in rooms_per_level.items()
+}
 
-# Inicializar contador con 0 para todos
-level_counter = Counter({level: 0 for level in valid_levels})
+# Función robusta para leer los eventos
+def parse_concatenated_json(content):
+    objects = []
+    buffer = ""
+    brace_count = 0
 
-# Leer archivos
+    for char in content:
+        if char == "{":
+            brace_count += 1
+        if brace_count > 0:
+            buffer += char
+        if char == "}":
+            brace_count -= 1
+            if brace_count == 0:
+                try:
+                    objects.append(json.loads(buffer))
+                except json.JSONDecodeError:
+                    pass
+                buffer = ""
+
+    return objects
+
 files_read = 0
 
-for i in range(max_files):
-    filename = base_filename.format(i)
+# Leer dinámicamente TODOS los archivos .json dentro de la carpeta
+if os.path.exists(telemetry_dir):
+    for filename in os.listdir(telemetry_dir):
+        if filename.endswith(".json"):
+            filepath = os.path.join(telemetry_dir, filename)
+            files_read += 1
 
-    if not os.path.exists(filename):
-        continue
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
+                events = parse_concatenated_json(content)
 
-    files_read += 1
+                # Recorrer eventos buscando muertes
+                for event in events:
+                    if isinstance(event, dict) and event.get("eventType") == "Player_Death":
+                        level_id = event.get("level_id")
+                        room_id = event.get("room_id")
 
-    with open(filename, "r", encoding="utf-8") as f:
-        try:
-            data = json.load(f)
+                        # Validar que el nivel y la sala existen en nuestro diccionario
+                        if level_id in rooms_per_level and room_id in rooms_per_level[level_id]:
+                            room_counter[level_id][room_id] += 1
+else:
+    print(f"Error: No se encontró la carpeta '{telemetry_dir}'")
 
-            # Caso 1: lista de eventos
-            if isinstance(data, list):
-                events = data
-            # Caso 2: objeto con clave tipo "events"
-            elif isinstance(data, dict):
-                events = data.get("events", [])
-            else:
-                events = []
+# Preparar datos para el gráfico
+labels = []
+counts = []
 
-        except json.JSONDecodeError:
-            # Caso 3: JSON por líneas (NDJSON)
-            f.seek(0)
-            events = []
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    events.append(json.loads(line))
-                except json.JSONDecodeError:
-                    print(f"Línea inválida en {filename}")
-
-        # Asumimos lista de eventos
-        for event in events:
-            if (
-                isinstance(event, dict) and
-                event.get("eventType") == "Player_Death"
-            ):
-                level_id = event.get("level_id")
-
-                if level_id in valid_levels:
-                    level_counter[level_id] += 1
-
-# Preparar datos SIEMPRE (aunque sean 0)
-levels = valid_levels
-counts = [level_counter[level] for level in levels]
+for level, rooms in rooms_per_level.items():
+    for room in rooms:
+        # Formateamos las etiquetas visuales, ej: "L1 - R1"
+        label = f"{level.replace('level_', 'L')} - {room.replace('room_', 'R')}"
+        labels.append(label)
+        counts.append(room_counter[level][room])
 
 # Debug útil
 print(f"Archivos leídos: {files_read}")
 print(f"Total Player_Death: {sum(counts)}")
+print("Muertes por sala:")
+for level, rooms in room_counter.items():
+    print(f"  {level}: {rooms}")
 
-# Crear gráfico (aunque todo sea 0)
-plt.figure()
-plt.bar(levels, counts)
-plt.xlabel("Level ID")
+# Crear carpeta si no existe
+os.makedirs("graficos", exist_ok=True)
+
+# Crear gráfico
+plt.figure(figsize=(10, 6))
+# Usamos color 'crimson' para distinguir las muertes de los tiempos o resets
+plt.bar(labels, counts, color='crimson', edgecolor='black')
+plt.xlabel("Nivel y Sala")
 plt.ylabel("Número de veces (Player_Death)")
-plt.title("Numero de muertes por nivel")
+plt.title("Número de muertes por sala")
 plt.xticks(rotation=45)
 
 plt.tight_layout()
-plt.savefig("graficos/grafico_muertes.png")
+plt.savefig("graficos/grafico_muertes_por_sala.png")

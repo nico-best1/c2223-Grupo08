@@ -2,7 +2,7 @@ import json
 import os
 import matplotlib.pyplot as plt
 
-# Configuración
+# Directorio donde están los JSON
 telemetry_dir = "telemetria"
 
 # Diccionario con salas y niveles
@@ -82,7 +82,7 @@ print(f"Total Manual_Reset: {sum(counts)}")
 
 os.makedirs("graficos", exist_ok=True)
 
-# Crear gráfico (aunque todo sea 0)
+# Crear gráfico 
 plt.figure(figsize=(10, 6))
 plt.bar(labels, counts, color='skyblue', edgecolor='black')
 plt.xlabel("Nivel y Sala")

@@ -3,7 +3,7 @@ import os
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
-# Configuración
+# Directorio donde están los JSON
 telemetry_dir = "telemetria"
 
 # Diccionario con salas y niveles
