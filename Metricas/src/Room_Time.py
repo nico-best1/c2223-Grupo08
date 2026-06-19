@@ -129,7 +129,14 @@ os.makedirs("graficos", exist_ok=True)
 
 # Gráfico
 plt.figure(figsize=(10, 6))
-plt.bar(labels, counts, color='skyblue', edgecolor='black')
+bars = plt.bar(labels, counts, color='skyblue', edgecolor='black')
+
+# Escribir el tiempo encima de cada barra
+for bar in bars:
+    yval = bar.get_height()
+    # Colocamos el texto justo encima (yval + 1) y centrado
+    plt.text(bar.get_x() + bar.get_width()/2, yval + 1, f'{round(yval, 1)}s', 
+                ha='center', va='bottom', fontweight='bold')
 plt.xlabel("Nivel y Sala")
 plt.ylabel("Tiempo medio por sesión (s)")
 plt.title("Tiempo medio por sala")

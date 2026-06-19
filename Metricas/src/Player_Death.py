@@ -101,8 +101,14 @@ os.makedirs("graficos", exist_ok=True)
 
 # Crear gráfico
 plt.figure(figsize=(10, 6))
-# Usamos color 'crimson' para distinguir las muertes de los tiempos o resets
-plt.bar(labels, percentages, color='crimson', edgecolor='black')
+bars = plt.bar(labels, percentages, color='skyblue', edgecolor='black')
+
+# Escribir el porcentaje encima de cada barra
+for bar in bars:
+    yval = bar.get_height()
+    # Colocamos el texto justo encima (yval + 1) y centrado
+    plt.text(bar.get_x() + bar.get_width()/2, yval + 1, f'{round(yval, 1)}%', 
+                ha='center', va='bottom', fontweight='bold')
 plt.xlabel("Nivel y Sala")
 plt.ylabel("Porcentaje sobre el total (%)")
 plt.title("Porcentaje de muertes por sala")
