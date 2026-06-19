@@ -13,7 +13,6 @@ valid_events = {
     "Player_Death"
 }
 
-# CONFIGURA TUS MAPAS AQUÍ
 MAP_CONFIG = {
     "level_1": {
         "width": 110,

@@ -74,7 +74,7 @@ if os.path.exists(telemetry_dir):
                     if event_type == "Room_Start":
                         start_times[level_id][room_id].append(timestamp)
 
-                    # Calcular duración al completar la sala O al morir
+                    # Calcular duración al completar la sala o al morir
                     elif event_type in ["Room_Complete", "Player_Death"]:
                         if start_times[level_id][room_id]:
                             start_time = start_times[level_id][room_id].pop(-1)

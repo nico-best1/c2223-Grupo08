@@ -3,13 +3,6 @@ echo Activando entorno virtual...
 
 call venv\Scripts\activate
 
-echo Ejecutando script Reduce_Size.py...
-
-python src\Reduce_Size.py
-
-echo.
-echo Ejecucion finalizada.
-
 echo Ejecutando script Manual_Reset.py...
 
 python src\Manual_Reset.py
@@ -24,9 +17,9 @@ python src\Player_Death.py
 echo.
 echo Ejecucion finalizada.
 
-echo Ejecutando script Level_Time.py...
+echo Ejecutando script Room_Time.py...
 
-python src\Level_Time.py
+python src\Room_Time.py
 echo.
 echo Ejecucion finalizada.
 
