@@ -14,13 +14,17 @@ rooms_per_level = {
     "level_4": ["room_1", "room_2"]
 }
 
-# Guardamos tiempos
+# Guardamos tiempos y sesiones únicas
 start_times = {
     level: {room: [] for room in rooms}
     for level, rooms in rooms_per_level.items()
 }
 total_time = {
     level: {room: 0 for room in rooms}
+    for level, rooms in rooms_per_level.items()
+}
+unique_sessions = {
+    level: {room: set() for room in rooms}
     for level, rooms in rooms_per_level.items()
 }
 
@@ -66,6 +70,7 @@ if os.path.exists(telemetry_dir):
                     level_id = event.get("level_id")
                     room_id = event.get("room_id")
                     timestamp = event.get("timeStamp")
+                    session_id = event.get("sessionId")
 
                     if level_id not in rooms_per_level or room_id not in rooms_per_level[level_id] or timestamp is None:
                         continue
@@ -83,6 +88,9 @@ if os.path.exists(telemetry_dir):
                             duration = (timestamp - start_time) / 1000
                             if duration > 0:
                                 total_time[level_id][room_id] += duration
+                                # Registramos la sesión
+                                if session_id:
+                                    unique_sessions[level_id][room_id].add(session_id)
 else:
     print(f"Error: No se encontró la carpeta '{telemetry_dir}'")
 
@@ -90,13 +98,27 @@ else:
 # Preparar datos para gráfico
 labels = []
 counts = []
+averages_for_print = {}
 
 for level, rooms in rooms_per_level.items():
+    averages_for_print[level] = {}
     for room in rooms:
         # Formateamos las etiquetas para que sean legibles, ej: "L1 - R1"
         label = f"{level.replace('level_', 'L')} - {room.replace('room_', 'R')}"
         labels.append(label)
-        counts.append(total_time[level][room])
+
+        # Cálculo de la media
+        total = total_time[level][room]
+        session_count = len(unique_sessions[level][room])
+
+        # Evitamos la división por cero si nadie ha jugado la sala
+        if session_count > 0:
+            avg_time = total / session_count
+        else:
+            avg_time = 0.0
+            
+        counts.append(avg_time)
+        averages_for_print[level][room] = round(avg_time, 2)
 
 
 print(f"Archivos leídos: {files_read}")
@@ -109,8 +131,8 @@ os.makedirs("graficos", exist_ok=True)
 plt.figure(figsize=(10, 6))
 plt.bar(labels, counts, color='skyblue', edgecolor='black')
 plt.xlabel("Nivel y Sala")
-plt.ylabel("Tiempo total (s)")
-plt.title("Tiempo total por sala (Room_Start → Room_Complete)")
+plt.ylabel("Tiempo medio por sesión (s)")
+plt.title("Tiempo medio por sala")
 plt.xticks(rotation=45)
 
 plt.tight_layout()
