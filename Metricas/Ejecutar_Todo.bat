@@ -29,4 +29,11 @@ python src\HeatMap.py
 
 echo.
 echo Ejecucion finalizada.
+
+echo Ejecutando script Death_Cause.py...
+
+python src\Death_Cause.py
+
+echo.
+echo Ejecucion finalizada.
 pause
