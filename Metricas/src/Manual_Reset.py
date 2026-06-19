@@ -76,6 +76,18 @@ for level, rooms in rooms_per_level.items():
         labels.append(label)
         counts.append(room_counter[level][room])
 
+# Calcular porcentajes
+total_resets = sum(counts)
+percentages = []
+
+for count in counts:
+    # Evitamos la división por cero si no hay ningún reset registrado
+    if total_resets > 0:
+        pct = (count / total_resets) * 100
+    else:
+        pct = 0.0
+    percentages.append(pct)
+
 # Debug útil
 print(f"Archivos leídos: {files_read}")
 print(f"Total Manual_Reset: {sum(counts)}")
@@ -84,10 +96,10 @@ os.makedirs("graficos", exist_ok=True)
 
 # Crear gráfico 
 plt.figure(figsize=(10, 6))
-plt.bar(labels, counts, color='skyblue', edgecolor='black')
+plt.bar(labels, percentages, color='skyblue', edgecolor='black')
 plt.xlabel("Nivel y Sala")
-plt.ylabel("Número de veces (Manual_Reset)")
-plt.title("Numero de resets por sala")
+plt.ylabel("Porcentaje sobre el total (%)")
+plt.title("Porcentaje de resets por sala")
 plt.xticks(rotation=45)
 
 plt.tight_layout()

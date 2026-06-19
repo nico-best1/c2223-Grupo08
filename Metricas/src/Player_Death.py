@@ -77,6 +77,18 @@ for level, rooms in rooms_per_level.items():
         labels.append(label)
         counts.append(room_counter[level][room])
 
+# Calcular porcentajes
+total_deaths = sum(counts)
+percentages = []
+
+for count in counts:
+    # Evitamos la división por cero
+    if total_deaths > 0:
+        pct = (count / total_deaths) * 100
+    else:
+        pct = 0.0
+    percentages.append(pct)
+
 # Debug útil
 print(f"Archivos leídos: {files_read}")
 print(f"Total Player_Death: {sum(counts)}")
@@ -90,10 +102,10 @@ os.makedirs("graficos", exist_ok=True)
 # Crear gráfico
 plt.figure(figsize=(10, 6))
 # Usamos color 'crimson' para distinguir las muertes de los tiempos o resets
-plt.bar(labels, counts, color='crimson', edgecolor='black')
+plt.bar(labels, percentages, color='crimson', edgecolor='black')
 plt.xlabel("Nivel y Sala")
-plt.ylabel("Número de veces (Player_Death)")
-plt.title("Número de muertes por sala")
+plt.ylabel("Porcentaje sobre el total (%)")
+plt.title("Porcentaje de muertes por sala")
 plt.xticks(rotation=45)
 
 plt.tight_layout()
