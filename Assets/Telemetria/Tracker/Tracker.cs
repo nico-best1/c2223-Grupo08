@@ -1,7 +1,9 @@
 
 using System;
+using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 // definicion de los formatos posibles para guardar los datos
 public enum formatType
@@ -160,7 +162,13 @@ public class Tracker
         e.setGameId("slime_escape");
 
         // se envia el evento al sistema de guardado
-        persistenceObject.Send(e);
+        if (persistenceObject != null)
+        {
+            Task.Run(() =>
+            {
+                persistenceObject.Send(e);
+            });
+        }
 
         // se incrementa el contador de eventos
         eventCount++;
@@ -169,11 +177,12 @@ public class Tracker
     // metodo para forzar el guardado de datos
     public void Flush()
     {
-        try
+        if (persistenceObject != null)
         {
-            if (persistenceObject != null)
+            Task.Run(() =>
+            {
                 persistenceObject.Flush();
+            });
         }
-        catch(Exception e) { /* de momento se ignoran las excepciones */ }
     }
 }

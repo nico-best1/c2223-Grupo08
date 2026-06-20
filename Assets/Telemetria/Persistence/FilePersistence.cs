@@ -12,8 +12,6 @@ public class FilePersistence : APersistence
     StreamWriter writer;
     DriveInfo drive;
 
-    Task pendingFlush = null;
-
     private void OpenStream()
     {
         writer = new StreamWriter(path, append: true);
@@ -55,7 +53,7 @@ public class FilePersistence : APersistence
         OpenStream();
     }
 
-    public override async Task Flush() {
+    public override void Flush() {
         if (writer == null)
             throw new InvalidOperationException("El stream no está abierto. Llama a setPath() primero.");
 
@@ -76,9 +74,6 @@ public class FilePersistence : APersistence
 
         try
         {
-            // Esperar al flush anterior antes de empezar el siguiente
-            if (pendingFlush != null)
-                await pendingFlush;
 
             // Escribir fuera del lock para no bloquear el hilo principal
             foreach (var line in serializedEvents)
@@ -87,7 +82,7 @@ public class FilePersistence : APersistence
             }
 
             // Lanzar flush sin esperar
-            pendingFlush = writer.FlushAsync();
+            writer.Flush();
         }
         catch (IOException ex) when (ex.HResult == unchecked((int)0x80070070))
         {

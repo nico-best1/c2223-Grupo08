@@ -30,6 +30,6 @@ public abstract class APersistence
         }
     }
 
-    public abstract Task Flush();
+    public abstract void Flush();
 
 }
