@@ -134,9 +134,9 @@ bars = plt.bar(labels, counts, color='skyblue', edgecolor='black')
 # Escribir el tiempo encima de cada barra
 for bar in bars:
     yval = bar.get_height()
-    # Colocamos el texto justo encima (yval + 1) y centrado
-    plt.text(bar.get_x() + bar.get_width()/2, yval + 1, f'{round(yval, 1)}s', 
-                ha='center', va='bottom', fontweight='bold')
+    # Colocamos el texto 
+    plt.text(bar.get_x() + bar.get_width()/2, bar.get_y()+yval/2, f'{round(yval, 1)}s', 
+                ha='center', va='center',fontsize = 7, fontweight='bold', color = 'black')
 plt.xlabel("Nivel y Sala")
 plt.ylabel("Tiempo medio por sesión (s)")
 plt.title("Tiempo medio por sala")

@@ -101,9 +101,10 @@ bars = plt.bar(labels, percentages, color='skyblue', edgecolor='black')
 # Escribir el porcentaje encima de cada barra
 for i, bar in enumerate(bars):
     yval = bar.get_height()
-    # Colocamos el texto justo encima (yval + 1) y centrado
-    plt.text(bar.get_x() + bar.get_width()/2, yval + 1, f'{round(yval, 1)}%({counts[i]})', 
-                ha='center', va='bottom', fontweight='bold')
+    # Colocamos el texto
+    if(yval > 0):
+        plt.text(bar.get_x() + bar.get_width()/2, bar.get_y()+yval/2, f'{round(yval, 1)}%({counts[i]})', 
+                ha='center', va='center',fontsize = 7, fontweight='bold', color = 'black')
 plt.xlabel("Nivel y Sala")
 plt.ylabel("Porcentaje sobre el total (%)")
 plt.title("Porcentaje de resets por sala")
