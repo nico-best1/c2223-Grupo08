@@ -9,7 +9,6 @@ max_files = 100
 
 valid_events = {
     "Manual_Reset",
-    "Reduce_Size",
     "Player_Death"
 }
 
