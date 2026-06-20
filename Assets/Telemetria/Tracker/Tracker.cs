@@ -63,6 +63,23 @@ public class Tracker
         if (filePersistence)
         {
             FilePersistence per = new FilePersistence();
+
+            // se configura el tipo de serializador segun el formato elegido
+            switch (format)
+            {
+                case formatType.JSON:
+                    per.setSerializer(new JSONSerializer());
+                    break;
+
+                case formatType.CSV:
+                    per.setSerializer(new CSVSerializer());
+                    break;
+
+                default:
+                    instance.persistenceObject = null;
+                    return "formato no reconocible";
+            }
+
             string filePath = "";
             string date = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
@@ -77,8 +94,6 @@ public class Tracker
             // si el formato es csv
             else if (format == formatType.CSV)
             {
-                UnityEngine.Debug.Log("CSV");
-
                 // se genera un nombre de archivo unico
                 filePath = filePath + ".csv";
             }
@@ -102,22 +117,6 @@ public class Tracker
             // si no hay persistencia o espacio suficiente, no se guarda nada
             instance.persistenceObject = null;
             return "persistencia en local desactivado";
-        }
-
-        // se configura el tipo de serializador segun el formato elegido
-        switch (format)
-        {
-            case formatType.JSON:
-                instance.persistenceObject.setSerializer(new JSONSerializer());
-                break;
-
-            case formatType.CSV:
-                instance.persistenceObject.setSerializer(new CSVSerializer());
-                break;
-
-            default:
-                instance.persistenceObject = null;
-                return "formato no reconocible";
         }
 
         // se registra el evento de inicio de sesion

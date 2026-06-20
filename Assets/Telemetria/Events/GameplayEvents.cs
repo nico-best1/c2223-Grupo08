@@ -17,7 +17,11 @@ public class Manual_Reset : TrackerEvent
 
     public override string ToCSV()
     {
-        return $"{base.ToCSV()},{level_id},{room_id},{player_position.x},{player_position.y}";
+        // Para que salga con punto en vez de coma
+        string px = player_position.x.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        string py = player_position.y.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        return $"{base.ToCSV()},{level_id},{room_id},{px},{py},";
     }
 }
 
@@ -38,6 +42,9 @@ public class Player_Death : TrackerEvent
 
     public override string ToCSV()
     {
-        return $"{base.ToCSV()},{level_id},{room_id},{player_position.x},{player_position.y},{cause}";
+        string px = player_position.x.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        string py = player_position.y.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+        return $"{base.ToCSV()},{level_id},{room_id},{px},{py},{cause}";
     }
 }

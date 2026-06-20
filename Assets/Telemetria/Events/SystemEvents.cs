@@ -5,11 +5,13 @@ using UnityEngine.UIElements;
 public class Session_Start : TrackerEvent
 {
     public Session_Start() : base() { }
+    public override string ToCSV() { return $"{base.ToCSV()},,,,,"; }
 }
 
 public class Session_End : TrackerEvent
 {
     public Session_End() : base() { }
+    public override string ToCSV() { return $"{base.ToCSV()},,,,,"; }
 }
 
 public class Level_Start : TrackerEvent
@@ -21,10 +23,7 @@ public class Level_Start : TrackerEvent
         this.level_id = levelId;
     }
 
-    public override string ToCSV()
-    {
-        return $"{base.ToCSV()},{level_id}";
-    }
+    public override string ToCSV() { return $"{base.ToCSV()},{level_id},,,,"; }
 }
 
 public class Level_Complete : TrackerEvent
@@ -36,10 +35,7 @@ public class Level_Complete : TrackerEvent
         this.level_id = levelId;
     }
 
-    public override string ToCSV()
-    {
-        return $"{base.ToCSV()},{level_id}";
-    }
+    public override string ToCSV() { return $"{base.ToCSV()},{level_id},,,,"; }
 }
 
 public class Room_Start : TrackerEvent
@@ -52,11 +48,7 @@ public class Room_Start : TrackerEvent
         this.level_id = levelId;
         this.room_id = roomId;
     }
-
-    public override string ToCSV()
-    {
-        return $"{base.ToCSV()},{level_id},{room_id}";
-    }
+    public override string ToCSV() { return $"{base.ToCSV()},{level_id},{room_id},,,"; }
 }
 
 public class Room_Complete : TrackerEvent
@@ -69,9 +61,5 @@ public class Room_Complete : TrackerEvent
         this.level_id = levelId;
         this.room_id = roomId;
     }
-
-    public override string ToCSV()
-    {
-        return $"{base.ToCSV()},{level_id},{room_id}";
-    }
+    public override string ToCSV() { return $"{base.ToCSV()},{level_id},{room_id},,,"; }
 }

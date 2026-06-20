@@ -42,6 +42,8 @@ public class FilePersistence : APersistence
         // Cerrar stream anterior si existía
         CloseStream();
 
+        bool isNewFile = !File.Exists(path);
+
         // se obtiene informacion del disco donde se guardaran los archivos
         drive = new DriveInfo(Path.GetPathRoot(Path.GetFullPath(p)));
         long freeSpace = drive.AvailableFreeSpace;
@@ -50,7 +52,17 @@ public class FilePersistence : APersistence
             throw new System.Exception("No hay suficiente espacio en el disco duro(2gb)");
 
         // Abrir el stream
-        OpenStream();
+        OpenStream();  
+
+        if (isNewFile && this.serializer != null)
+        {
+            string header = this.serializer.getHeader();
+            if (!string.IsNullOrEmpty(header))
+            {
+                writer.WriteLine(header);
+                writer.Flush();
+            }
+        }
     }
 
     public override void Flush() {
