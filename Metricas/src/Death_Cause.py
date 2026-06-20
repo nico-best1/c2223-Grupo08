@@ -83,6 +83,14 @@ for level, rooms in rooms_per_level.items():
         totals.append(sum(row))
 
 total_all = sum(totals)
+
+cause_totals = {cause: 0 for cause in all_causes}
+for level in data:
+    for room in data[level]:
+        for cause, count in data[level][room].items():
+            cause_totals[cause] += count
+
+
 print(f"Archivos leidos: {files_read}")
 print(f"Total Player_Death: {total_all}")
 print("\nMuertes por sala y causa:")
@@ -97,6 +105,14 @@ for i, (level, rooms) in enumerate(rooms_per_level.items()):
                 if c > 0:
                     print(f"    {cause}: {c} ({c/t*100:.1f}%)")
 
+print("\nPorcentaje global por causa de muerte:")
+if total_all > 0:
+    for cause in all_causes:
+        c_tot = cause_totals[cause]
+        print(f"  {cause}: {c_tot} ({(c_tot / total_all) * 100:.1f}%)")
+else:
+    print("  Sin muertes registradas.")
+
 os.makedirs("graficos", exist_ok=True)
 
 plt.figure(figsize=(12, 6))
@@ -107,7 +123,11 @@ colors = plt.cm.Set2.colors[:len(all_causes)]
 
 for j, cause in enumerate(all_causes):
     values = [room_cause_counts[i][j] for i in range(len(labels))]
-    bars = plt.bar(x, values, bottom=bottom, label=cause, color=colors[j % len(colors)], edgecolor='black', linewidth=0.5)
+    # Mostrar el porcentaje global en la leyenda
+    global_pct = (cause_totals[cause] / total_all * 100) if total_all > 0 else 0
+    legend_label = f"{cause} ({global_pct:.1f}%)"
+
+    bars = plt.bar(x, values, bottom=bottom, label=legend_label, color=colors[j % len(colors)], edgecolor='black', linewidth=0.5)
     for i, bar in enumerate(bars):
         h = bar.get_height()
         if h > 0:
@@ -120,7 +140,8 @@ plt.xlabel("Nivel y Sala")
 plt.ylabel("Numero de muertes")
 plt.title("Distribucion de causas de muerte por sala")
 plt.xticks(list(x), labels, rotation=45)
-plt.legend(title="Causa")
+
+plt.legend(title="Causa (Total %)", bbox_to_anchor=(1.05, 1), loc='upper left')
 
 plt.tight_layout()
 plt.savefig("graficos/grafico_muertes_por_causa.png")
