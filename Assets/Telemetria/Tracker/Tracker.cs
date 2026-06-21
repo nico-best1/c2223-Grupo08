@@ -140,7 +140,10 @@ public class Tracker
             if (instance.persistenceObject != null)
             {
                 // Flush síncrono para asegurar persistencia antes de salir
-                instance.persistenceObject.Flush(instance.events.getEvents(instance.persistenceObject.getSerializer()));
+                lock (instance.lockObject)
+                {
+                    instance.persistenceObject.Flush(instance.events.getEvents(instance.persistenceObject.getSerializer()));
+                }
             }
         }
 
