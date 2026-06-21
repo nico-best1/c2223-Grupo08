@@ -73,21 +73,28 @@ public class FilePersistence : APersistence
         if (drive.AvailableFreeSpace < MINIMUM_SPACE_TO_WRITE)
             throw new IOException("Espacio insuficiente en disco para continuar escribiendo (mínimo 100MB)");
 
-        // Copiar eventos bajo lock para evitar race conditions con Send()
-        System.Collections.Generic.List<string> serializedEvents = new System.Collections.Generic.List<string>();
+        // Copiar eventos raw bajo lock para evitar race conditions con Send()
+        System.Collections.Generic.List<TrackerEvent> eventsToFlush = new System.Collections.Generic.List<TrackerEvent>();
         lock (lockObject)
         {
             for (int i = MaxBuffer + index - eventSize; i < MaxBuffer + index; i++)
             {
-                serializedEvents.Add(this.serializer.serialize(events[i % MaxBuffer]));
+                eventsToFlush.Add(events[i % MaxBuffer]);
             }
             eventSize = 0;
+        }
+
+        // Serializar fuera del lock para no bloquear el hilo principal
+        System.Collections.Generic.List<string> serializedEvents = new System.Collections.Generic.List<string>();
+        foreach (var evt in eventsToFlush)
+        {
+            serializedEvents.Add(this.serializer.serialize(evt));
         }
 
         try
         {
 
-            // Escribir fuera del lock para no bloquear el hilo principal
+            // Escribir 
             foreach (var line in serializedEvents)
             {
                 writer.WriteLine(line);

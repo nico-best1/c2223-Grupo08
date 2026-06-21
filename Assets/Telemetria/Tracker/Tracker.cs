@@ -128,13 +128,14 @@ public class Tracker
     // metodo para finalizar la sesion
     public static void End(bool flush = true)
     {
-
         // se registra el evento de fin de sesion
         instance.TrackEvent(new Session_End());
 
-        // se fuerzan a guardar los datos pendientes
         if (flush)
-            instance.Flush();
+        {
+            // Flush síncrono para asegurar persistencia antes de salir
+            try { instance.persistenceObject.Flush(); } catch (Exception) { }
+        }
 
         // se elimina la instancia
         instance = null;
@@ -163,10 +164,7 @@ public class Tracker
         // se envia el evento al sistema de guardado
         if (persistenceObject != null)
         {
-            Task.Run(() =>
-            {
-                persistenceObject.Send(e);
-            });
+            persistenceObject.Send(e);
         }
 
         // se incrementa el contador de eventos
