@@ -1,9 +1,6 @@
 
 using System;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.CompilerServices;
 
 // definicion de los formatos posibles para guardar los datos
 public enum formatType
@@ -16,6 +13,10 @@ public class Tracker
 {
     //evitar llamadas al constructor con new
     private Tracker() { }
+
+    private readonly object lockObject = new object(); // Sincronizacion para volcado asincrono
+
+    private CircularArray events;
 
     //unica instancia del tracker
     private static Tracker instance = null;
@@ -119,6 +120,8 @@ public class Tracker
             return "persistencia en local desactivado";
         }
 
+        instance.events = new CircularArray();
+
         // se registra el evento de inicio de sesion
         instance.TrackEvent(new Session_Start());
 
@@ -165,7 +168,10 @@ public class Tracker
         {
             Task.Run(() =>
             {
-                persistenceObject.Send(e);
+                lock (lockObject)
+                {
+                    events.addEvent(e);
+                }
             });
         }
 
@@ -180,7 +186,10 @@ public class Tracker
         {
             Task.Run(() =>
             {
-                persistenceObject.Flush();
+                lock (lockObject)
+                {
+                    persistenceObject.Flush(events.getEvents(persistenceObject.getSerializer()));
+                }
             });
         }
     }

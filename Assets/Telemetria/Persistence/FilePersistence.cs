@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 
 public class FilePersistence : APersistence
 {
@@ -65,7 +65,10 @@ public class FilePersistence : APersistence
         }
     }
 
-    public override void Flush() {
+    public override void Flush(List<string> serializedEvents) {
+        if(serializedEvents == null)
+            throw new InvalidOperationException("Se ha tratado de guardar una lista vacia.");
+
         if (writer == null)
             throw new InvalidOperationException("El stream no está abierto. Llama a setPath() primero.");
 
@@ -74,15 +77,6 @@ public class FilePersistence : APersistence
             throw new IOException("Espacio insuficiente en disco para continuar escribiendo (mínimo 100MB)");
 
         // Copiar eventos bajo lock para evitar race conditions con Send()
-        System.Collections.Generic.List<string> serializedEvents = new System.Collections.Generic.List<string>();
-        lock (lockObject)
-        {
-            for (int i = MaxBuffer + index - eventSize; i < MaxBuffer + index; i++)
-            {
-                serializedEvents.Add(this.serializer.serialize(events[i % MaxBuffer]));
-            }
-            eventSize = 0;
-        }
 
         try
         {

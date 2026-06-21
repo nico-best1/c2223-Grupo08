@@ -1,35 +1,16 @@
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 public abstract class APersistence
 {
-    protected const int MaxBuffer = 50;
-    protected int index = 0;
-    protected TrackerEvent[] events = new TrackerEvent[MaxBuffer];
     protected ISerializer serializer;
-    protected int eventSize = 0;
-    protected readonly object lockObject = new object(); // Sincronizacion para volcado asincrono
 
     public void setSerializer(ISerializer s)
     {
         serializer = s;
     }
 
-    public void Send(TrackerEvent e)
-    {
-        lock (lockObject) // Proteger buffer circular ante acceso concurrente
-        {
-            if(eventSize<MaxBuffer)
-                eventSize++;
+    public ISerializer getSerializer() { return serializer; }
 
-            events[index] = e;
-
-            if (index < MaxBuffer - 1)
-                index++;
-            else
-                index = 0;
-        }
-    }
-
-    public abstract void Flush();
+    public abstract void Flush(List<string> serializedEvents);
 
 }
