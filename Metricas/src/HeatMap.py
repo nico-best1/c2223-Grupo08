@@ -2,10 +2,10 @@ import json
 import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import numpy as np
 
 # Configuración
-base_filename = "telemetria/telemetry_{}.json"
-max_files = 100
+telemetry_dir = "telemetria"
 
 valid_events = {
     "Manual_Reset",
@@ -54,7 +54,6 @@ heatmaps = {
 
 files_read = 0
 
-
 def parse_concatenated_json(content):
     objects = []
     buffer = ""
@@ -78,60 +77,57 @@ def parse_concatenated_json(content):
 
 
 # Leer archivos
-for i in range(max_files):
-    filename = base_filename.format(i)
+if os.path.exists(telemetry_dir):
+    for filename in os.listdir(telemetry_dir):
+        filepath = os.path.join(telemetry_dir, filename)
+        files_read += 1
 
-    if not os.path.exists(filename):
-        continue
+        with open(filepath, "r", encoding="utf-8") as f:
+            content = f.read()
+            events = parse_concatenated_json(content)
 
-    files_read += 1
+            for event in events:
+                if not isinstance(event, dict):
+                    continue
 
-    with open(filename, "r", encoding="utf-8") as f:
-        content = f.read()
-        events = parse_concatenated_json(content)
+                event_type = event.get("eventType")
+                if event_type not in valid_events:
+                    continue
 
-        for event in events:
-            if not isinstance(event, dict):
-                continue
+                level_id = event.get("level_id")
+                if level_id not in MAP_CONFIG:
+                    continue
 
-            event_type = event.get("eventType")
-            if event_type not in valid_events:
-                continue
+                pos = event.get("player_position")
+                if not pos:
+                    continue
 
-            level_id = event.get("level_id")
-            if level_id not in MAP_CONFIG:
-                continue
+                x = pos.get("x")
+                y = pos.get("y")
 
-            pos = event.get("player_position")
-            if not pos:
-                continue
+                if x is None or y is None:
+                    continue
+                config = MAP_CONFIG[level_id]
 
-            x = pos.get("x")
-            y = pos.get("y")
+                map_width = config["width"]
+                map_height = config["height"]
 
-            if x is None or y is None:
-                continue
-            config = MAP_CONFIG[level_id]
+                # Convertir a grid
+                offset_x = config["offset_x"]
+                offset_y = config["offset_y"]
 
-            map_width = config["width"]
-            map_height = config["height"]
+                # Aplicar offset
+                x_adj = x + offset_x
+                y_adj = y + offset_y
 
-            # Convertir a grid
-            offset_x = config["offset_x"]
-            offset_y = config["offset_y"]
+                # Normalizar
+                grid_x = int((x_adj / map_width) * (config["width"] - 1))
+                grid_y = int((y_adj / map_height) * (config["height"] - 1))
 
-            # Aplicar offset
-            x_adj = x + offset_x
-            y_adj = y + offset_y
+                grid_x = max(0, min(config["width"] - 1, grid_x))
+                grid_y = max(0, min(config["height"] - 1, grid_y))
 
-            # Normalizar
-            grid_x = int((x_adj / map_width) * (config["width"] - 1))
-            grid_y = int((y_adj / map_height) * (config["height"] - 1))
-
-            grid_x = max(0, min(config["width"] - 1, grid_x))
-            grid_y = max(0, min(config["height"] - 1, grid_y))
-
-            heatmaps[level_id][event_type][grid_y][grid_x] += 1
+                heatmaps[level_id][event_type][grid_y][grid_x] += 1
 
 
 print(f"Archivos leídos: {files_read}")
@@ -152,19 +148,22 @@ for level_id, events_dict in heatmaps.items():
 
     for event_type, heatmap in events_dict.items():
 
-        plt.figure()
+        # Calculamos el tamaño exacto para no deformar la imagen
+        ancho_pulgadas = config["width"] / 10
+        alto_pulgadas = config["height"] / 10
+        plt.figure(figsize=(ancho_pulgadas, alto_pulgadas))
 
         # Imagen base
         plt.imshow(img, extent=[0, config["width"], 0, config["height"]])
-        if not all(all(cell == 0 for cell in row) for row in heatmap):
-            # Heatmap
-            plt.imshow(
-                heatmap,
-                cmap='hot',
-                alpha=0.5,
-                origin='lower',
-                extent=[0, config["width"], 0, config["height"]]
-            )
+
+        # Heatmap
+        plt.imshow(
+            heatmap,
+            cmap='hot',
+            alpha=0.5,
+            origin='lower',
+            extent=[0, config["width"], 0, config["height"]],
+        )
 
         plt.colorbar(label="Frecuencia")
         plt.title(f"{level_id} - {event_type}")
