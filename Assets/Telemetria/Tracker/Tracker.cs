@@ -1,6 +1,7 @@
 
 using System;
 using System.Threading.Tasks;
+using UnityEditor.Experimental.GraphView;
 
 // definicion de los formatos posibles para guardar los datos
 public enum formatType
@@ -123,7 +124,7 @@ public class Tracker
         instance.events = new CircularArray();
 
         // se registra el evento de inicio de sesion
-        instance.TrackEvent(new Session_Start());
+        instance.TrackEvent(new Session_Start(), true);
 
         return null;
     }
@@ -131,25 +132,8 @@ public class Tracker
     // metodo para finalizar la sesion
     public static void End(bool flush = true)
     {
-        // si no hay sistema de persistencia, no hace nada
-        if (instance.persistenceObject == null)
-            return;
-
-        TrackerEvent e = new Session_End();
-
-        // Filtro para ignorar eventos desactivados desde el inspector o configuracion
-        if (instance.disabledEvents.Contains(e.eventType))
-            return;
-
-        // se genera un id unico para el evento
-        string eventId = "event_" + instance.eventCount;
-
-        // Se asignan datos comunes de forma automatica reduciendo acoplamiento
-        e.setSessionId(instance.sessionId);
-        e.setEventId(eventId);
-        e.setGameId("slime_escape");
-
-        instance.events.addEvent(e);
+        // se registra el evento de final de sesion
+        instance.TrackEvent(new Session_End(), true);
 
         if (flush)
         {
@@ -165,7 +149,7 @@ public class Tracker
     }
 
     // metodo para registrar un evento
-    public void TrackEvent(TrackerEvent e)
+    public void TrackEvent(TrackerEvent e, bool syncrono = false)
     {
 
         // si no hay sistema de persistencia, no hace nada
@@ -187,13 +171,25 @@ public class Tracker
         // se envia el evento al sistema de guardado
         if (persistenceObject != null)
         {
-            Task.Run(() =>
+            if (syncrono)
             {
+                // Por si se quiere hacer un track desde el hilo principal.
+                // Tambien es necesario el lock porque Flush se puede lanzar desde otro hilo.
                 lock (lockObject)
                 {
                     events.addEvent(e);
                 }
-            });
+            }
+            else
+            {
+                Task.Run(() =>
+                {
+                    lock (lockObject)
+                    {
+                        events.addEvent(e);
+                    }
+                });
+            }
         }
 
         // se incrementa el contador de eventos
