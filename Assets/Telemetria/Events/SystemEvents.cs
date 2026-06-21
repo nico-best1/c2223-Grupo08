@@ -37,29 +37,3 @@ public class Level_Complete : TrackerEvent
 
     public override string ToCSV() { return $"{base.ToCSV()},{level_id},,,,"; }
 }
-
-public class Room_Start : TrackerEvent
-{
-    public string level_id;
-    public string room_id;
-
-    public Room_Start(string levelId, string roomId) : base()
-    {
-        this.level_id = levelId;
-        this.room_id = roomId;
-    }
-    public override string ToCSV() { return $"{base.ToCSV()},{level_id},{room_id},,,"; }
-}
-
-public class Room_Complete : TrackerEvent
-{
-    public string level_id;
-    public string room_id;
-
-    public Room_Complete(string levelId, string roomId) : base()
-    {
-        this.level_id = levelId;
-        this.room_id = roomId;
-    }
-    public override string ToCSV() { return $"{base.ToCSV()},{level_id},{room_id},,,"; }
-}
