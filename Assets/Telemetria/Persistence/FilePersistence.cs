@@ -76,13 +76,6 @@ public class FilePersistence : APersistence
         if (drive.AvailableFreeSpace < MINIMUM_SPACE_TO_WRITE)
             throw new IOException("Espacio insuficiente en disco para continuar escribiendo (mínimo 100MB)");
 
-        // Serializar fuera del lock para no bloquear el hilo principal
-        System.Collections.Generic.List<string> serializedEvents = new System.Collections.Generic.List<string>();
-        foreach (var evt in eventsToFlush)
-        {
-            serializedEvents.Add(this.serializer.serialize(evt));
-        }
-
         try
         {
 

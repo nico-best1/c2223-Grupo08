@@ -131,13 +131,33 @@ public class Tracker
     // metodo para finalizar la sesion
     public static void End(bool flush = true)
     {
-        // se registra el evento de fin de sesion
-        instance.TrackEvent(new Session_End());
+        // si no hay sistema de persistencia, no hace nada
+        if (instance.persistenceObject == null)
+            return;
+
+        TrackerEvent e = new Session_End();
+
+        // Filtro para ignorar eventos desactivados desde el inspector o configuracion
+        if (instance.disabledEvents.Contains(e.eventType))
+            return;
+
+        // se genera un id unico para el evento
+        string eventId = "event_" + instance.eventCount;
+
+        // Se asignan datos comunes de forma automatica reduciendo acoplamiento
+        e.setSessionId(instance.sessionId);
+        e.setEventId(eventId);
+        e.setGameId("slime_escape");
+
+        instance.events.addEvent(e);
 
         if (flush)
         {
-            // Flush síncrono para asegurar persistencia antes de salir
-            try { instance.persistenceObject.Flush(); } catch (Exception) { }
+            if (instance.persistenceObject != null)
+            {
+                // Flush síncrono para asegurar persistencia antes de salir
+                instance.persistenceObject.Flush(instance.events.getEvents(instance.persistenceObject.getSerializer()));
+            }
         }
 
         // se elimina la instancia
