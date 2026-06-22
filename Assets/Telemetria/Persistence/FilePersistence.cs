@@ -78,7 +78,6 @@ public class FilePersistence : APersistence
 
         try
         {
-
             // Escribir 
             foreach (var line in serializedEvents)
             {
