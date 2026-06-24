@@ -1,7 +1,6 @@
 
 using System;
 using System.Threading.Tasks;
-using UnityEditor.Experimental.GraphView;
 
 // definicion de los formatos posibles para guardar los datos
 public enum formatType
